@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "deploy": "npx ipfs-deploy ."
+    "deploy": "npx ipfs-deploy .",
+    "serve": "npx http-server --cors ."
   },
   "keywords": [],
   "author": "",

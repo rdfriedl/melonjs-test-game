@@ -1,5 +1,5 @@
 {
-	"mainMap": "main-map",
+  "mainMap": "main-map",
   "resources": [
     {
       "name": "Dungeon_Tileset",

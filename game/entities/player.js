@@ -1,4 +1,6 @@
 import me from "../lib/melon.js";
+import { loadIpfsWorld } from "../services/world-manager.js";
+import DoorEntity from "./door.js";
 
 export default class PlayerEntity extends me.Entity {
   constructor(x, y, settings) {
@@ -88,6 +90,16 @@ export default class PlayerEntity extends me.Entity {
    * colision handler
    */
   onCollision(response, other) {
+    if (other instanceof DoorEntity) {
+      if(other.loadWorld){
+        loadIpfsWorld(other.loadWorld);
+        return false;
+      }
+      if(other.to){
+        me.level.load(other.to);
+        return false;
+      }
+    }
     // if (response.b.body.collisionType === me.collision.types.WORLD_SHAPE) {
     //     // makes the other object solid, by substracting the overlap vector to the current position
     //     this.pos.sub(response.overlapV);

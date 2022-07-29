@@ -1,68 +1,35 @@
 import me from "./lib/melon.js";
-import resources from "./resources.js";
+import { globalResources, hubWorldResources } from "./resources.js";
 import PlayerEntity from "../entities/player.js";
+import DoorEntity from "./entities/door.js";
+import GameScreen from "./stages/game.js";
+import { loadPack } from "./services/resource-manager.js";
+import "./services/world-manager.js"
 
 window.me = me;
 
-me.device.onReady(function () {
+me.device.onReady(() => {
   // initialize the display canvas once the device/browser is ready
   if (!me.video.init(910, 512, { parent: "screen", scale: "auto" })) {
     alert("Your browser does not support HTML5 canvas.");
     return;
   }
 
-  me.game.world.gravity.set(0, 0);
-  me.pool.register("player", PlayerEntity);
+  // setup game objects
+  me.pool.register("Player", PlayerEntity);
+  me.pool.register("Door", DoorEntity);
 
-  me.loader.preload(resources, () => {
-    // me.level.load("main-map");
+  // setup states
+  me.state.set(me.state.PLAY, new GameScreen());
+
+  // load global game resources
+  me.loader.preload(globalResources, () => {
+    // load hub world
+    loadPack(hubWorldResources).then(() => {
+      me.state.change(me.state.PLAY, "hub");
+    });
   });
 });
 
-
-async function loadWorld(ipfsHash){
-  const baseURL = `https://ipfs.infura.io/ipfs/${ipfsHash}/`
-  const metadata = await fetch(new URL('world.json', baseURL).toString()).then(res => res.json());
-
-  if(!metadata.resources || !metadata.mainMap){
-    throw new Error("failed to load world");
-  }
-
-  const resources = metadata.resources.map(resource => {
-    if(resource.src){
-      return {
-        ...resource,
-        src: new URL(resource.src, baseURL).toString()
-      }
-    }
-    return resource;
-  });
-
-  const dataUrls = [];
-  await Promise.all(resources.map(async (resource) => {
-    if(resource.src && resource.type === 'image'){
-      const blob = await fetch(resource.src).then(res => res.blob());
-      const dataUrl = URL.createObjectURL(blob);
-      dataUrls.push(dataUrl);
-      resource.src = dataUrl;
-    }
-  }))
-
-  me.loader.preload(resources, () => {
-    me.level.load(metadata.mainMap);
-  });
-
-  return () => {
-    console.log('unloading resources');
-    for (const resource of resources) {
-      me.loader.unload(resource);
-    }
-
-    console.log('revoking dataUrls');
-    for (const dataUrl of dataUrls) {
-      URL.revokeObjectURL(dataUrl);
-    }
-  }
-}
-
-window.loadWorld = loadWorld;
+// loadWorld('QmQVWXNKRFBRvekRGh9SrFtffiL59Sk5nJag583N6y4y4z')
+// loadWorld('Qmdho6mNHEVeTDTHaXKY7Siq1eScpRwnaGRq2M6D2RC3gn')

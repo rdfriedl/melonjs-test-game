@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.0" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="7" nextobjectid="22">
+<map version="1.9" tiledversion="1.9.0" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="7" nextobjectid="23">
  <tileset firstgid="1" source="../tilesets/Dungeon_Tileset.tsx"/>
  <layer id="4" name="floor" width="30" height="20">
   <data encoding="csv">
@@ -74,11 +74,16 @@
 </data>
  </layer>
  <objectgroup id="3" name="player">
-  <object id="21" name="player" x="146.667" y="209.333">
+  <object id="21" name="Player" x="87.0003" y="159">
    <point/>
   </object>
+  <object id="22" name="Door" x="32" y="128" width="32" height="32">
+   <properties>
+    <property name="to" value="room2"/>
+   </properties>
+  </object>
  </objectgroup>
- <objectgroup id="6" name="Collision">
+ <objectgroup id="6" name="Collision" visible="0">
   <object id="1" x="0" y="0" width="288" height="128"/>
   <object id="2" x="288" y="0" width="288" height="192"/>
   <object id="3" x="480" y="192" width="96" height="64"/>

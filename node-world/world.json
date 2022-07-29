@@ -1,5 +1,5 @@
 {
-	"mainMap": "main",
+  "mainMap": "main",
   "resources": [
     {
       "name": "Dungeon_Tileset",
@@ -15,6 +15,11 @@
       "name": "main",
       "type": "tmx",
       "src": "./maps/main.tmx"
+    },
+    {
+      "name": "room2",
+      "type": "tmx",
+      "src": "./maps/room2.tmx"
     }
   ]
 }
