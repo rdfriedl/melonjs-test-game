@@ -1,6 +1,7 @@
 import me from "./lib/melon.js";
 import resources from "./resources.js";
-import PlayerEntity from "./entities/player.js";
+import PlayerEntity from "../entities/player.js";
+import { getNodeChannels, getPopularNodes } from "../services/amboss.js";
 
 window.me = me;
 
@@ -18,4 +19,11 @@ me.device.onReady(function () {
 
     me.level.load("main-map");
   });
+
+  getPopularNodes().then(async (data) => {
+    console.log(data);
+
+    const channels = await getNodeChannels(data[0]);
+    console.log(channels);
+  })
 });

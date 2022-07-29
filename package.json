@@ -1,0 +1,23 @@
+{
+  "name": "melonjs-test-game",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "start": "npx live-server ./game"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rdfriedl/melonjs-test-game.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rdfriedl/melonjs-test-game/issues"
+  },
+  "homepage": "https://github.com/rdfriedl/melonjs-test-game#readme"
+}
