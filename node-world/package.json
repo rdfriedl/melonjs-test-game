@@ -1,0 +1,12 @@
+{
+  "name": "world",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "npx ipfs-deploy ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

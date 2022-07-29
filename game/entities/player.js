@@ -4,7 +4,7 @@ export default class PlayerEntity extends me.Entity {
   constructor(x, y, settings) {
     // call the constructor
     // dont pass the settings in from the map
-    super(x, y, {height: 16, width: 24});
+    super(x, y, { height: 16, width: 24 });
 
     // set a "player object" type
     this.body.collisionType = me.collision.types.PLAYER_OBJECT;

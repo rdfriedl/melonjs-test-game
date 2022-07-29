@@ -1,20 +1,25 @@
 import { makeRequest } from "./graphql.js";
 
-const AMBOSS_ENDPOINT = 'https://api.amboss.space/graphql';
+const AMBOSS_ENDPOINT = "https://api.amboss.space/graphql";
 
-export async function getPopularNodes(){
-	const result =  await makeRequest(AMBOSS_ENDPOINT, `
+export async function getPopularNodes() {
+  const result = await makeRequest(
+    AMBOSS_ENDPOINT,
+    `
 		query Query {
 			getPopularNodes
 		}
-	`)
+	`
+  );
 
-	return result.data.getPopularNodes;
+  return result.data.getPopularNodes;
 }
-export async function getNodeChannels(pubkey){
-	if(!pubkey) throw new Error("missing pubkey");
+export async function getNodeChannels(pubkey) {
+  if (!pubkey) throw new Error("missing pubkey");
 
-	const result = await makeRequest(AMBOSS_ENDPOINT, `
+  const result = await makeRequest(
+    AMBOSS_ENDPOINT,
+    `
 		query Query($pubkey: String!) {
 			getNode(pubkey: $pubkey) {
 				graph_info {
@@ -32,7 +37,9 @@ export async function getNodeChannels(pubkey){
 				}
 			}
 		}
-	`, {pubkey})
+	`,
+    { pubkey }
+  );
 
-	return result.data.getNode.graph_info.channels;
+  return result.data.getNode.graph_info.channels;
 }

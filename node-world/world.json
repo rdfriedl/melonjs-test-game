@@ -1,0 +1,20 @@
+{
+	"mainMap": "main",
+  "resources": [
+    {
+      "name": "Dungeon_Tileset",
+      "type": "image",
+      "src": "./tilesets/Dungeon_Tileset.png"
+    },
+    {
+      "name": "Dungeon_Tileset",
+      "type": "tsx",
+      "src": "./tilesets/Dungeon_Tileset.tsx"
+    },
+    {
+      "name": "main",
+      "type": "tmx",
+      "src": "./maps/main.tmx"
+    }
+  ]
+}

@@ -1,7 +1,6 @@
 import me from "./lib/melon.js";
 import resources from "./resources.js";
 import PlayerEntity from "../entities/player.js";
-import { getNodeChannels, getPopularNodes } from "../services/amboss.js";
 
 window.me = me;
 
@@ -12,18 +11,58 @@ me.device.onReady(function () {
     return;
   }
 
+  me.game.world.gravity.set(0, 0);
+  me.pool.register("player", PlayerEntity);
+
   me.loader.preload(resources, () => {
-    me.pool.register("player", PlayerEntity);
+    // me.level.load("main-map");
+  });
+});
 
-    me.game.world.gravity.set(0, 0);
 
-    me.level.load("main-map");
+async function loadWorld(ipfsHash){
+  const baseURL = `https://ipfs.infura.io/ipfs/${ipfsHash}/`
+  const metadata = await fetch(new URL('world.json', baseURL).toString()).then(res => res.json());
+
+  if(!metadata.resources || !metadata.mainMap){
+    throw new Error("failed to load world");
+  }
+
+  const resources = metadata.resources.map(resource => {
+    if(resource.src){
+      return {
+        ...resource,
+        src: new URL(resource.src, baseURL).toString()
+      }
+    }
+    return resource;
   });
 
-  getPopularNodes().then(async (data) => {
-    console.log(data);
+  const dataUrls = [];
+  await Promise.all(resources.map(async (resource) => {
+    if(resource.src && resource.type === 'image'){
+      const blob = await fetch(resource.src).then(res => res.blob());
+      const dataUrl = URL.createObjectURL(blob);
+      dataUrls.push(dataUrl);
+      resource.src = dataUrl;
+    }
+  }))
 
-    const channels = await getNodeChannels(data[0]);
-    console.log(channels);
-  })
-});
+  me.loader.preload(resources, () => {
+    me.level.load(metadata.mainMap);
+  });
+
+  return () => {
+    console.log('unloading resources');
+    for (const resource of resources) {
+      me.loader.unload(resource);
+    }
+
+    console.log('revoking dataUrls');
+    for (const dataUrl of dataUrls) {
+      URL.revokeObjectURL(dataUrl);
+    }
+  }
+}
+
+window.loadWorld = loadWorld;
