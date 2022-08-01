@@ -2,7 +2,7 @@ import me from "./lib/melon.js";
 import { globalResources, hubWorldResources } from "./resources.js";
 import PlayerEntity from "../entities/player.js";
 import DoorEntity from "./entities/door.js";
-import GameScreen from "./stages/game.js";
+import PlayScreen from "./screens/play.js";
 import { loadPack } from "./services/resource-manager.js";
 import "./services/world-manager.js"
 
@@ -20,7 +20,7 @@ me.device.onReady(() => {
   me.pool.register("Door", DoorEntity);
 
   // setup states
-  me.state.set(me.state.PLAY, new GameScreen());
+  me.state.set(me.state.PLAY, new PlayScreen());
 
   // load global game resources
   me.loader.preload(globalResources, () => {

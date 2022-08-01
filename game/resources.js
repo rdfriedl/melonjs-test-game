@@ -45,6 +45,9 @@ export const globalResources = [
   {
     name: "Male-01-1",
     type: "image",
-    src: "spites/character/Male/Male 01-1.png",
+    src: "sprites/character/Male/Male 01-1.png",
   },
+
+  // cursor
+  {name: "cursor", type: "image", src: 'sprites/cursor.png'}
 ];
