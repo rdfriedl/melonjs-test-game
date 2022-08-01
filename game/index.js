@@ -4,7 +4,7 @@ import PlayerEntity from "../entities/player.js";
 import DoorEntity from "./entities/door.js";
 import PlayScreen from "./screens/play.js";
 import { loadPack } from "./services/resource-manager.js";
-import "./services/world-manager.js"
+import "./services/world-manager.js";
 
 window.me = me;
 

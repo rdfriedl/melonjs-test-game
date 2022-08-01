@@ -1,7 +1,7 @@
 import me from "../lib/melon.js";
 import { loadPack } from "./resource-manager.js";
 
-async function loadWorldMetadata(baseURL){
+async function loadWorldMetadata(baseURL) {
   const metadata = await fetch(new URL("world.json", baseURL).toString()).then(
     (res) => res.json()
   );
@@ -32,34 +32,34 @@ async function loadWorldMetadata(baseURL){
     })
   );
 
-	const unload = () => {
+  const unload = () => {
     for (const dataUrl of dataUrls) {
       URL.revokeObjectURL(dataUrl);
     }
-	}
+  };
 
-	return {
-		...metadata,
-		resources,
-		unload,
-	}
+  return {
+    ...metadata,
+    resources,
+    unload,
+  };
 }
 
 let loadedWorld = null;
 
-export function loadIpfsWorld(ipfsHash){
+export function loadIpfsWorld(ipfsHash) {
   return loadWorld(`https://ipfs.infura.io/ipfs/${ipfsHash}/`);
 }
 
 export async function loadWorld(url) {
-	me.state.change(me.state.LOADING);
+  me.state.change(me.state.LOADING);
   const world = await loadWorldMetadata(url);
 
-	if(loadedWorld){
-		loadedWorld.unload();
-	}
-	await loadPack(world.resources);
-	me.state.change(me.state.PLAY, world.mainMap);
+  if (loadedWorld) {
+    loadedWorld.unload();
+  }
+  await loadPack(world.resources);
+  me.state.change(me.state.PLAY, world.mainMap);
 }
 
 window.loadWorld = loadWorld;

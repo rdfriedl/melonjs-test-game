@@ -1,6 +1,7 @@
 export const hubWorldResources = [
   // images
   { name: "doors", type: "image", src: "tilesets/doors.png" },
+  { name: "walls", type: "image", src: "tilesets/walls.png" },
   { name: "TX Plant", type: "image", src: "tilesets/TX Plant.png" },
   { name: "TX Player", type: "image", src: "tilesets/TX Player.png" },
   { name: "TX Props", type: "image", src: "tilesets/TX Props.png" },
@@ -32,6 +33,7 @@ export const hubWorldResources = [
 
   // tilesets
   { name: "doors", type: "tsx", src: "tilesets/doors.tsx" },
+  { name: "walls", type: "tsx", src: "tilesets/walls.tsx" },
   { name: "Tileset Grass", type: "tsx", src: "tilesets/Tileset Grass.tsx" },
   { name: "Tileset Wall", type: "tsx", src: "tilesets/Tileset Wall.tsx" },
   { name: "Struct", type: "tsx", src: "tilesets/Struct.tsx" },
@@ -49,5 +51,5 @@ export const globalResources = [
   },
 
   // cursor
-  {name: "cursor", type: "image", src: 'sprites/cursor.png'}
+  { name: "cursor", type: "image", src: "sprites/cursor.png" },
 ];

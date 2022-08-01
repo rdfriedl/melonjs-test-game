@@ -13,7 +13,7 @@ export default class PlayerEntity extends me.Sprite {
       framewidth: 32,
       frameheight: 32,
       anchorPoint: new me.Vector2d(0.5, 0.5),
-     });
+    });
 
     // player can exit the viewport (jumping, falling into a hole, etc.)
     this.alwaysUpdate = true;
@@ -33,45 +33,41 @@ export default class PlayerEntity extends me.Sprite {
     this.goToPos = null;
   }
 
-  setCurrentAnimationIfNotSet(animation){
+  setCurrentAnimationIfNotSet(animation) {
     if (!this.isCurrentAnimation(animation)) {
       this.setCurrentAnimation(animation);
     }
   }
 
   update(dt) {
-    if(this.navPath.length > 0 && this.goToPos == null){
+    if (this.navPath.length > 0 && this.goToPos == null) {
       this.goToPos = this.navPath.pop();
     }
 
-    if(this.goToPos){
-      const vel = new me.Vector2d(0,0);
-      if(Math.abs(this.goToPos.x - this.pos.x) > 4){
-        vel.x = Math.sign(this.goToPos.x-this.pos.x) * 4;
+    if (this.goToPos) {
+      const vel = new me.Vector2d(0, 0);
+      if (Math.abs(this.goToPos.x - this.pos.x) > 4) {
+        vel.x = Math.sign(this.goToPos.x - this.pos.x) * 4;
       }
 
-      if(Math.abs(this.goToPos.y - this.pos.y) > 4){
-        vel.y = Math.sign(this.goToPos.y-this.pos.y) * 4;
+      if (Math.abs(this.goToPos.y - this.pos.y) > 4) {
+        vel.y = Math.sign(this.goToPos.y - this.pos.y) * 4;
       }
 
-      if(!vel.x && !vel.y){
+      if (!vel.x && !vel.y) {
         this.pos.setV(this.goToPos);
         this.goToPos = null;
-      }
-      else {
+      } else {
         this.pos.add(vel);
 
-        if(vel.x > 0){
-          this.setCurrentAnimationIfNotSet('walk-right')
-        }
-        else if(vel.x < 0){
-          this.setCurrentAnimationIfNotSet('walk-left')
-        }
-        else if(vel.y > 0){
-          this.setCurrentAnimationIfNotSet('walk-down')
-        }
-        else if(vel.y < 0){
-          this.setCurrentAnimationIfNotSet('walk-up')
+        if (vel.x > 0) {
+          this.setCurrentAnimationIfNotSet("walk-right");
+        } else if (vel.x < 0) {
+          this.setCurrentAnimationIfNotSet("walk-left");
+        } else if (vel.y > 0) {
+          this.setCurrentAnimationIfNotSet("walk-down");
+        } else if (vel.y < 0) {
+          this.setCurrentAnimationIfNotSet("walk-up");
         }
       }
 
@@ -82,8 +78,8 @@ export default class PlayerEntity extends me.Sprite {
     return false;
   }
 
-  setNavPath(path){
-    this.navPath = path;
+  setNavPath(path) {
+    this.navPath = path ?? [];
   }
 
   /**
