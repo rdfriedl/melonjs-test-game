@@ -15,14 +15,12 @@ class PlayScreen extends me.Stage {
 
     // register on mouse event
     me.input.registerPointerEvent("pointermove", me.game.viewport, (event) => {
-      const x = Math.floor(event.gameWorldX/32)*32;
-      const y = Math.floor(event.gameWorldY/32)*32;
-      this.cursor.pos.set(x,y);
+      const cord = this.getNavCellFromGlobalCord(event.gameWorldX, event.gameWorldY);
+      this.cursor.pos.set(cord.x*32, cord.y*32);
 
-      const tileMap = me.level.getCurrentLevel();
-      const navLayer = tileMap.getLayers().find(layer => layer.name === 'nav');
+      const navLayer = this.getNavLayer();
       if(navLayer){
-        const tile = navLayer.getTile(x,y);
+        const tile = navLayer.cellAt(cord.x, cord.y);
 
         const canNavigate = !tile;
         if(canNavigate){
@@ -38,13 +36,16 @@ class PlayScreen extends me.Stage {
     me.input.registerPointerEvent("pointerdown", me.game.viewport, async (event) => {
       const player = this.getPlayer();
       if(player){
-        const level = me.level.getCurrentLevel();
-        const w = level.tilewidth;
-        const h = level.tileheight;
-        const start = new me.Vector2d(Math.floor(event.gameWorldX/w),Math.floor(event.gameWorldY/h));
-        const end = new me.Vector2d(player.pos.x, player.pos.y).div(w, h).floorSelf();
+        const cord = this.getNavCellFromGlobalCord(event.gameWorldX, event.gameWorldY);
+        const navLayer = this.getNavLayer();
+        const tile = navLayer.cellAt(cord.x, cord.y);
+        if(tile) return;
 
-        this.playerPath = await this.findNavPath(start, end);
+        const start = cord.clone();
+        const end = this.getNavCellFromGlobalCord(player.pos.x, player.pos.y);
+
+        const navPath = await this.findNavPath(start, end);
+        player.setNavPath(navPath);
       }
     });
 
@@ -78,12 +79,25 @@ class PlayScreen extends me.Stage {
     return me.game.world.children.find(el => el instanceof PlayerEntity)
   }
 
+  getNavCellFromGlobalCord(x,y){
+    const level = me.level.getCurrentLevel();
+    return new me.Vector2d(Math.floor(x/level.tilewidth), Math.floor(y / level.tileheight))
+  }
   createNavGrid(){
     const navLayer = this.getNavLayer();
 
     if(navLayer){
       this.navGrid = new Grid();
-      this.navGrid.setGrid(navLayer.layerData.map(arr => arr.map(tile => 0+!!tile)))
+      // flip the grid since tiled exports in x/y and the grid wants y/x
+      const navGridData = [];
+      for (let x = 0; x < navLayer.layerData.length; x++) {
+        const column = navLayer.layerData[x];
+        for (let y = 0; y < column.length; y++) {
+          const tile = column[y];
+          (navGridData[y] = navGridData[y] || [])[x] = 0+!!tile;
+        }
+      }
+      this.navGrid.setGrid(navGridData)
       this.navGrid.setAcceptableTiles([0]);
     }
   }
@@ -91,8 +105,12 @@ class PlayScreen extends me.Stage {
     return new Promise((res) => {
       if(!this.navGrid) return null;
 
+      const level = me.level.getCurrentLevel();
       this.navGrid.findPath(start.x, start.y, end.x, end.y, (path) => {
-        res(path);
+        if(!path) return null;
+
+        const pathInGlobalCords = path.map(point => new me.Vector2d(point.x+0.5, point.y+0.5).scale(level.tilewidth, level.tileheight));
+        res(pathInGlobalCords);
       })
     })
   }
@@ -100,16 +118,6 @@ class PlayScreen extends me.Stage {
   onGameUpdate(){
     if(this.navGrid){
       this.navGrid.calculate();
-    }
-
-    const player = this.getPlayer();
-    if(player && this.playerPath && this.playerPath.length > 0){
-      const level = me.level.getCurrentLevel();
-      const w = level.tilewidth;
-      const h = level.tileheight;
-      const newPos = this.playerPath.pop();
-
-      player.pos.set(newPos.x, newPos.y).scale(w, h).add(new me.Vector2d(8,8));
     }
   }
 
