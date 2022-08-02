@@ -25,11 +25,12 @@ class PlayScreen extends me.Stage {
       "pointermove",
       me.game.viewport,
       (event) => {
+        const level = me.level.getCurrentLevel();
         const cord = this.getNavCellFromGlobalCord(
           event.gameWorldX,
           event.gameWorldY
         );
-        this.cursor.pos.set(cord.x * 32, cord.y * 32);
+        this.cursor.pos.set(cord.x * level.tilewidth, cord.y * level.tileheight);
 
         const walls = getCellWalls(cord.x, cord.y);
 

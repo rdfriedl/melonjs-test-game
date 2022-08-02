@@ -30,6 +30,7 @@ export const hubWorldResources = [
 
   // maps
   { name: "hub", type: "tmx", src: "maps/main.tmx" },
+  { name: "right", type: "tmx", src: "maps/right.tmx" },
 
   // tilesets
   { name: "doors", type: "tsx", src: "tilesets/doors.tsx" },

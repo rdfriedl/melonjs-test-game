@@ -188,7 +188,7 @@
   <object id="3" name="Player" x="528.333" y="722.667">
    <point/>
   </object>
-  <object id="134" name="Door" x="544" y="1270" width="96" height="10">
+  <object id="134" name="Door" x="544" y="1248" width="96" height="32">
    <properties>
     <property name="loadWorld" value="QmQVWXNKRFBRvekRGh9SrFtffiL59Sk5nJag583N6y4y4z"/>
    </properties>
