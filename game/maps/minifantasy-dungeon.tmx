@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.0" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="8" tileheight="8" infinite="0" nextlayerid="12" nextobjectid="29">
+<map version="1.9" tiledversion="1.9.0" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="8" tileheight="8" infinite="0" nextlayerid="12" nextobjectid="30">
  <tileset firstgid="1" source="../tilesets/Minifantasy_Dungeon/Minifantasy_DungeonFloorTiles.tsx"/>
  <tileset firstgid="15" source="../tilesets/Minifantasy_Dungeon/Minifantasy_DungeonWallTiles.tsx"/>
  <tileset firstgid="113" source="../tilesets/Minifantasy_Dungeon/Minifantasy_DungeonCliffTiles.tsx"/>
@@ -103,8 +103,11 @@
 </data>
  </layer>
  <objectgroup id="5" name="player">
-  <object id="1" name="door" x="160" y="0" width="16" height="8"/>
-  <object id="2" name="door" x="104" y="152" width="24" height="8"/>
+  <object id="1" name="Door" x="160" y="0" width="16" height="8"/>
+  <object id="2" name="Door" x="104" y="152" width="24" height="8"/>
+  <object id="29" name="Player" x="109" y="117.25">
+   <point/>
+  </object>
  </objectgroup>
  <objectgroup id="10" name="enemy_spawn">
   <object id="11" x="136" y="56" width="40" height="24"/>

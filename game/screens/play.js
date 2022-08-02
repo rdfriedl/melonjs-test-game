@@ -30,7 +30,10 @@ class PlayScreen extends me.Stage {
           event.gameWorldX,
           event.gameWorldY
         );
-        this.cursor.pos.set(cord.x * level.tilewidth, cord.y * level.tileheight);
+        this.cursor.pos.set(
+          cord.x * level.tilewidth,
+          cord.y * level.tileheight
+        );
 
         const walls = getCellWalls(cord.x, cord.y);
 

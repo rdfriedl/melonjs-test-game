@@ -1,15 +1,18 @@
 import me from "../lib/melon.js";
-import { loadIpfsWorld } from "../services/world-manager.js";
-import DoorEntity from "./door.js";
+// import { loadIpfsWorld } from "../services/world-manager.js";
+// import DoorEntity from "./door.js";
+
+const imageFrames = (x,y,w,count) => new Array(count).fill(0).map((_, i) => (y*w)+x+i);
+
+const MOVE_SPEED = 1;
 
 export default class PlayerEntity extends me.Sprite {
-  constructor(x, y, settings) {
+  constructor(x, y) {
     // call the constructor
-    // dont pass the settings in from the map
     super(x, y, {
-      height: 32,
-      width: 32,
-      image: "Male-01-1",
+      height: 8,
+      width: 8,
+      image: "Minifantasy_CreaturesHumanBaseAnimations",
       framewidth: 32,
       frameheight: 32,
       anchorPoint: new me.Vector2d(0.5, 0.5),
@@ -21,13 +24,24 @@ export default class PlayerEntity extends me.Sprite {
     // set the viewport to follow this on both axis, and enable damping
     me.game.viewport.follow(this, me.game.viewport.AXIS.BOTH, 1);
 
-    // define a basic walking animatin
-    this.addAnimation("walk-down", [0, 1, 2]);
-    this.addAnimation("walk-left", [3, 4, 5]);
-    this.addAnimation("walk-right", [6, 7, 8]);
-    this.addAnimation("walk-up", [9, 10, 11]);
+    // define a basic walking animation
+    this.addAnimation("walk-down-right", imageFrames(0,21,16,4));
+    this.addAnimation("walk-down-left", imageFrames(0,22,16,4));
+    this.addAnimation("walk-up-right", imageFrames(0,23,16,4));
+    this.addAnimation("walk-up-left", imageFrames(0,24,16,4));
+
+    this.addAnimation("idle-down-right", imageFrames(0,11,16,16), 200);
+    this.addAnimation("idle-down-left", imageFrames(0,12,16,16), 200);
+    this.addAnimation("idle-up-right", imageFrames(0,13,16,16), 200);
+    this.addAnimation("idle-up-left", imageFrames(0,14,16,16), 200);
     // set as default
-    this.setCurrentAnimation("walk-down");
+    this.setCurrentAnimation("walk-down-right");
+
+    this.action = 'idle';
+    this.faceHDirection = "right";
+    this.faceVDirection = 'down';
+
+    this.idling = 0;
 
     this.navPath = [];
     this.goToPos = null;
@@ -40,42 +54,52 @@ export default class PlayerEntity extends me.Sprite {
   }
 
   update(dt) {
+    this.idling += dt;
+
     if (this.navPath.length > 0 && this.goToPos == null) {
       this.goToPos = this.navPath.pop();
     }
 
     if (this.goToPos) {
       const vel = new me.Vector2d(0, 0);
-      if (Math.abs(this.goToPos.x - this.pos.x) > 4) {
-        vel.x = Math.sign(this.goToPos.x - this.pos.x) * 4;
+      if (Math.abs(this.goToPos.x - this.pos.x) > MOVE_SPEED) {
+        vel.x = Math.sign(this.goToPos.x - this.pos.x) * MOVE_SPEED;
       }
 
-      if (Math.abs(this.goToPos.y - this.pos.y) > 4) {
-        vel.y = Math.sign(this.goToPos.y - this.pos.y) * 4;
+      if (Math.abs(this.goToPos.y - this.pos.y) > MOVE_SPEED) {
+        vel.y = Math.sign(this.goToPos.y - this.pos.y) * MOVE_SPEED;
       }
 
       if (!vel.x && !vel.y) {
         this.pos.setV(this.goToPos);
         this.goToPos = null;
+        this.action = 'idle';
       } else {
+        this.idling = 0;
         this.pos.add(vel);
+        this.action = 'walk';
 
         if (vel.x > 0) {
-          this.setCurrentAnimationIfNotSet("walk-right");
+          this.faceHDirection = "right";
         } else if (vel.x < 0) {
-          this.setCurrentAnimationIfNotSet("walk-left");
+          this.faceHDirection = "left";
         } else if (vel.y > 0) {
-          this.setCurrentAnimationIfNotSet("walk-down");
+          this.faceVDirection = "down";
         } else if (vel.y < 0) {
-          this.setCurrentAnimationIfNotSet("walk-up");
+          this.faceVDirection = "up";
         }
       }
-
-      super.update(dt);
-      return true;
     }
 
-    return false;
+    // if player has been idling for > 1 second change direction
+    if(this.idling > 100 && this.faceVDirection === 'up'){
+      this.faceVDirection = 'down';
+    }
+
+    this.setCurrentAnimationIfNotSet([this.action, this.faceVDirection, this.faceHDirection].join('-'));
+
+    super.update(dt);
+    return true;
   }
 
   setNavPath(path) {

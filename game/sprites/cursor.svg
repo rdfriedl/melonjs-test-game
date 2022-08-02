@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="32"
-   height="32"
-   viewBox="0 0 8.4666662 8.4666662"
+   width="8"
+   height="8"
+   viewBox="0 0 2.1166666 2.1166666"
    version="1.1"
    id="svg5"
    inkscape:version="1.2.1 (ef4d3fba62, 2022-07-19, custom)"
@@ -18,24 +18,28 @@
    xmlns:svg="http://www.w3.org/2000/svg">
   <sodipodi:namedview
      id="namedview7"
-     pagecolor="#ffffff"
+     pagecolor="#757575"
      bordercolor="#000000"
      borderopacity="0.25"
      inkscape:showpageshadow="2"
-     inkscape:pageopacity="0.0"
+     inkscape:pageopacity="0"
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
-     showgrid="false"
-     inkscape:zoom="20.70196"
-     inkscape:cx="3.8885207"
-     inkscape:cy="20.650219"
+     showgrid="true"
+     inkscape:zoom="58.553985"
+     inkscape:cx="1.5114257"
+     inkscape:cy="5.5760509"
      inkscape:window-width="2502"
      inkscape:window-height="1376"
      inkscape:window-x="58"
      inkscape:window-y="27"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g1629" />
+     inkscape:current-layer="g1629">
+    <inkscape:grid
+       type="xygrid"
+       id="grid1880" />
+  </sodipodi:namedview>
   <defs
      id="defs2" />
   <g
@@ -44,23 +48,15 @@
      id="layer1">
     <g
        id="g1634"
-       style="stroke:#ff0000;stroke-width:0.56321778;stroke-dasharray:none;stroke-opacity:1"
+       style="stroke:#ff0000;stroke-width:0.563218;stroke-dasharray:none;stroke-opacity:1"
        transform="matrix(0.93954178,0,0,0.93954178,0.2559398,0.25593981)">
       <g
          id="g1629"
-         style="stroke:#ff0000;stroke-width:0.56321778;stroke-dasharray:none;stroke-opacity:1">
-        <g
-           id="g1625"
-           style="stroke:#ffffff;stroke-width:0.530339;stroke-dasharray:none;stroke-opacity:1"
-           transform="matrix(1.0622374,0,0,1.0622374,-0.26347176,-0.26347177)">
-          <rect
-             style="fill:none;stroke:#ffffff;stroke-width:0.530339;stroke-dasharray:none;stroke-opacity:1"
-             id="rect111"
-             width="7.9531541"
-             height="7.9531541"
-             x="0.25675586"
-             y="0.25675604" />
-        </g>
+         style="stroke:#ff0000;stroke-width:0.563218;stroke-dasharray:none;stroke-opacity:1">
+        <path
+           style="fill:#ffffff;stroke-width:1.06435;stroke:none"
+           d="M -0.27240917,-0.27240918 V 1.980462 H 1.980462 V -0.27240918 H 0.00919973 v 0.2816089 H 1.6988531 V 1.6988531 H 0.00919973 v -1.97126228 z"
+           id="path2353" />
       </g>
     </g>
   </g>

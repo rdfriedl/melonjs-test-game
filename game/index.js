@@ -10,7 +10,7 @@ window.me = me;
 
 me.device.onReady(() => {
   // initialize the display canvas once the device/browser is ready
-  if (!me.video.init(910, 512, { parent: "screen", scale: "auto" })) {
+  if (!me.video.init(480, 256, { parent: "screen", scale: "auto" })) {
     alert("Your browser does not support HTML5 canvas.");
     return;
   }
@@ -24,9 +24,8 @@ me.device.onReady(() => {
 
   // load global game resources
   me.loader.preload(globalResources, () => {
-    // load hub world
     loadPack(hubWorldResources).then(() => {
-      me.state.change(me.state.PLAY, "hub");
+      me.state.change(me.state.PLAY, "minifantasy-dungeon");
     });
   });
 });

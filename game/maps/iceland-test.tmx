@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.0" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="8" tileheight="8" infinite="0" nextlayerid="10" nextobjectid="21">
+<map version="1.9" tiledversion="1.9.0" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="8" tileheight="8" infinite="0" nextlayerid="11" nextobjectid="22">
  <tileset firstgid="1" source="../tilesets/Minifantasy_IcyWilderness/Minifantasy_IcyWildernessAllTiles.tsx"/>
  <tileset firstgid="1901" source="../tilesets/Minifantasy_IcyWilderness/Minifantasy_IcyWildernessAllTilesShadows.tsx"/>
  <tileset firstgid="3801" source="../tilesets/Minifantasy_Walls.tsx"/>
@@ -75,6 +75,11 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
+ <objectgroup id="10" name="player">
+  <object id="21" name="Player" x="93.75" y="37.75">
+   <point/>
+  </object>
+ </objectgroup>
  <objectgroup id="8" name="enemy_spawn">
   <object id="4" x="104" y="32" width="48" height="56"/>
   <object id="5" x="72" y="120" width="168" height="40"/>
