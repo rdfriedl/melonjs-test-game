@@ -2,7 +2,8 @@ import me from "../lib/melon.js";
 // import { loadIpfsWorld } from "../services/world-manager.js";
 // import DoorEntity from "./door.js";
 
-const imageFrames = (x,y,w,count) => new Array(count).fill(0).map((_, i) => (y*w)+x+i);
+const imageFrames = (x, y, w, count) =>
+  new Array(count).fill(0).map((_, i) => y * w + x + i);
 
 const MOVE_SPEED = 1;
 
@@ -25,21 +26,21 @@ export default class PlayerEntity extends me.Sprite {
     me.game.viewport.follow(this, me.game.viewport.AXIS.BOTH, 1);
 
     // define a basic walking animation
-    this.addAnimation("walk-down-right", imageFrames(0,21,16,4));
-    this.addAnimation("walk-down-left", imageFrames(0,22,16,4));
-    this.addAnimation("walk-up-right", imageFrames(0,23,16,4));
-    this.addAnimation("walk-up-left", imageFrames(0,24,16,4));
+    this.addAnimation("walk-down-right", imageFrames(0, 21, 16, 4));
+    this.addAnimation("walk-down-left", imageFrames(0, 22, 16, 4));
+    this.addAnimation("walk-up-right", imageFrames(0, 23, 16, 4));
+    this.addAnimation("walk-up-left", imageFrames(0, 24, 16, 4));
 
-    this.addAnimation("idle-down-right", imageFrames(0,11,16,16), 200);
-    this.addAnimation("idle-down-left", imageFrames(0,12,16,16), 200);
-    this.addAnimation("idle-up-right", imageFrames(0,13,16,16), 200);
-    this.addAnimation("idle-up-left", imageFrames(0,14,16,16), 200);
+    this.addAnimation("idle-down-right", imageFrames(0, 11, 16, 16), 200);
+    this.addAnimation("idle-down-left", imageFrames(0, 12, 16, 16), 200);
+    this.addAnimation("idle-up-right", imageFrames(0, 13, 16, 16), 200);
+    this.addAnimation("idle-up-left", imageFrames(0, 14, 16, 16), 200);
     // set as default
     this.setCurrentAnimation("walk-down-right");
 
-    this.action = 'idle';
+    this.action = "idle";
     this.faceHDirection = "right";
-    this.faceVDirection = 'down';
+    this.faceVDirection = "down";
 
     this.idling = 0;
 
@@ -73,11 +74,11 @@ export default class PlayerEntity extends me.Sprite {
       if (!vel.x && !vel.y) {
         this.pos.setV(this.goToPos);
         this.goToPos = null;
-        this.action = 'idle';
+        this.action = "idle";
       } else {
         this.idling = 0;
         this.pos.add(vel);
-        this.action = 'walk';
+        this.action = "walk";
 
         if (vel.x > 0) {
           this.faceHDirection = "right";
@@ -92,11 +93,13 @@ export default class PlayerEntity extends me.Sprite {
     }
 
     // if player has been idling for > 1 second change direction
-    if(this.idling > 100 && this.faceVDirection === 'up'){
-      this.faceVDirection = 'down';
+    if (this.idling > 100 && this.faceVDirection === "up") {
+      this.faceVDirection = "down";
     }
 
-    this.setCurrentAnimationIfNotSet([this.action, this.faceVDirection, this.faceHDirection].join('-'));
+    this.setCurrentAnimationIfNotSet(
+      [this.action, this.faceVDirection, this.faceHDirection].join("-")
+    );
 
     super.update(dt);
     return true;
