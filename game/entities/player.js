@@ -39,10 +39,10 @@ export default class PlayerEntity extends me.Sprite {
     this.setCurrentAnimation("walk-down-right");
 
     this.action = "idle";
+    this.actionTime = 0;
+
     this.faceHDirection = "right";
     this.faceVDirection = "down";
-
-    this.idling = 0;
 
     this.navPath = [];
     this.goToPos = null;
@@ -54,8 +54,15 @@ export default class PlayerEntity extends me.Sprite {
     }
   }
 
+  setAction(action) {
+    if (this.action !== action) {
+      this.action = action;
+      this.actionTime = 0;
+    }
+  }
+
   update(dt) {
-    this.idling += dt;
+    this.actionTime += dt;
 
     if (this.navPath.length > 0 && this.goToPos == null) {
       this.goToPos = this.navPath.pop();
@@ -74,11 +81,10 @@ export default class PlayerEntity extends me.Sprite {
       if (!vel.x && !vel.y) {
         this.pos.setV(this.goToPos);
         this.goToPos = null;
-        this.action = "idle";
+        this.setAction("idle");
       } else {
-        this.idling = 0;
         this.pos.add(vel);
-        this.action = "walk";
+        this.setAction("walk");
 
         if (vel.x > 0) {
           this.faceHDirection = "right";
@@ -89,11 +95,20 @@ export default class PlayerEntity extends me.Sprite {
         } else if (vel.y < 0) {
           this.faceVDirection = "up";
         }
+
+        // // if the player is walking horizontally for more than .5 sec switch the direction to down
+        // if (this.action === 'walk' && vel.y === 0 && this.actionTime > 100 && this.faceVDirection === "up") {
+        //   this.faceVDirection = "down";
+        // }
       }
     }
 
     // if player has been idling for > 1 second change direction
-    if (this.idling > 100 && this.faceVDirection === "up") {
+    if (
+      this.action === "idle" &&
+      this.actionTime > 100 &&
+      this.faceVDirection === "up"
+    ) {
       this.faceVDirection = "down";
     }
 
