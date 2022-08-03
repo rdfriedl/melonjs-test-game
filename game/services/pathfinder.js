@@ -125,14 +125,33 @@ export function updateNavGrid() {
 
 export function findNavPath(start, end) {
   return new Promise((res) => {
-    grid.findPath(start.x, start.y, end.x, end.y, (path) => {
-      if (path) {
-        res(path.map(({ x, y }) => new me.Vector2d(x, y)));
+    grid.findPath(end.x, end.y, start.x, start.y, (rawPoints) => {
+      if (rawPoints) {
+        const path = rawPoints.map(({ x, y }) => new me.Vector2d(x, y));
+        res(simplifyPath(path));
       } else {
         res(null);
       }
     });
   });
+}
+
+export function simplifyPath(path) {
+  const newPath = [];
+
+  for (let i = 0; i < path.length; i++) {
+    const prev = path[i - 1];
+    const point = path[i];
+    const next = path[i + 1];
+
+    // keep this point if there is no prev or next (start or end).
+    // or if the next point dose not align at all with the prev point
+    if (!prev || !next || (next.x !== prev.x && next.y !== prev.y)) {
+      newPath.push(point);
+    }
+  }
+
+  return newPath;
 }
 
 export function convertPathToLevelCords(path) {

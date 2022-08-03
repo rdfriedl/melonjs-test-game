@@ -7,7 +7,7 @@ import {
   convertPathToLevelCords,
   getCellWalls,
   WALLS,
-} from "../services/level-navigator.js";
+} from "../services/pathfinder.js";
 
 class PlayScreen extends me.Stage {
   onResetEvent(mainMap) {
@@ -52,17 +52,19 @@ class PlayScreen extends me.Stage {
       async (event) => {
         const player = this.getPlayer();
         if (player) {
-          const cord = this.getNavCellFromGlobalCord(
+          const targetCell = this.getNavCellFromGlobalCord(
             event.gameWorldX,
             event.gameWorldY
           );
-          const walls = getCellWalls(cord.x, cord.y);
+          const playerCell = this.getNavCellFromGlobalCord(
+            player.pos.x,
+            player.pos.y
+          );
+
+          const walls = getCellWalls(targetCell.x, targetCell.y);
           if (walls === WALLS.ALL) return;
 
-          const start = cord.clone();
-          const end = this.getNavCellFromGlobalCord(player.pos.x, player.pos.y);
-
-          const navPath = await findNavPath(start, end);
+          const navPath = await findNavPath(playerCell, targetCell);
           player.setNavPath(convertPathToLevelCords(navPath));
         }
       }

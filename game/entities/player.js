@@ -26,10 +26,10 @@ export default class PlayerEntity extends me.Sprite {
     me.game.viewport.follow(this, me.game.viewport.AXIS.BOTH, 1);
 
     // define a basic walking animation
-    this.addAnimation("walk-down-right", imageFrames(0, 21, 16, 4));
-    this.addAnimation("walk-down-left", imageFrames(0, 22, 16, 4));
-    this.addAnimation("walk-up-right", imageFrames(0, 23, 16, 4));
-    this.addAnimation("walk-up-left", imageFrames(0, 24, 16, 4));
+    this.addAnimation("walk-down-right", imageFrames(0, 21, 16, 4), 100);
+    this.addAnimation("walk-down-left", imageFrames(0, 22, 16, 4), 100);
+    this.addAnimation("walk-up-right", imageFrames(0, 23, 16, 4), 100);
+    this.addAnimation("walk-up-left", imageFrames(0, 24, 16, 4), 100);
 
     this.addAnimation("idle-down-right", imageFrames(0, 11, 16, 16), 200);
     this.addAnimation("idle-down-left", imageFrames(0, 12, 16, 16), 200);
@@ -96,10 +96,15 @@ export default class PlayerEntity extends me.Sprite {
           this.faceVDirection = "up";
         }
 
-        // // if the player is walking horizontally for more than .5 sec switch the direction to down
-        // if (this.action === 'walk' && vel.y === 0 && this.actionTime > 100 && this.faceVDirection === "up") {
-        //   this.faceVDirection = "down";
-        // }
+        // if the player is walking horizontally for more than .5 sec switch the direction to down
+        if (
+          this.action === "walk" &&
+          vel.y === 0 &&
+          this.actionTime > 100 &&
+          this.faceVDirection === "up"
+        ) {
+          this.faceVDirection = "down";
+        }
       }
     }
 
