@@ -13,7 +13,7 @@ export default class PlayerEntity extends me.Sprite {
     super(x, y, {
       height: 8,
       width: 8,
-      image: "Minifantasy_CreaturesHumanBaseAnimations",
+      image: "HumanBaseAnimations",
       framewidth: 32,
       frameheight: 32,
       anchorPoint: new me.Vector2d(0.5, 0.5),

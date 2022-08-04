@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.9" tiledversion="1.9.0" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="8" tileheight="8" infinite="0" nextlayerid="12" nextobjectid="30">
- <tileset firstgid="1" source="../tilesets/Minifantasy_Dungeon/Minifantasy_DungeonFloorTiles.tsx"/>
- <tileset firstgid="15" source="../tilesets/Minifantasy_Dungeon/Minifantasy_DungeonWallTiles.tsx"/>
- <tileset firstgid="113" source="../tilesets/Minifantasy_Dungeon/Minifantasy_DungeonCliffTiles.tsx"/>
- <tileset firstgid="115" source="../tilesets/Minifantasy_Dungeon/Minifantasy_DungeonWallTilesetShadows.tsx"/>
- <tileset firstgid="213" source="../tilesets/Minifantasy_Walls.tsx"/>
- <tileset firstgid="228" source="../tilesets/Minifantasy_Dungeon/Minifantasy_DungeonProps.tsx"/>
+ <tileset firstgid="1" source="../tilesets/Dungeon/DungeonFloorTiles.tsx"/>
+ <tileset firstgid="15" source="../tilesets/Dungeon/DungeonWallTiles.tsx"/>
+ <tileset firstgid="113" source="../tilesets/Dungeon/DungeonCliffTiles.tsx"/>
+ <tileset firstgid="115" source="../tilesets/Dungeon/DungeonWallTilesetShadows.tsx"/>
+ <tileset firstgid="213" source="../tilesets/Walls.tsx"/>
+ <tileset firstgid="228" source="../tilesets/Dungeon/DungeonProps.tsx"/>
  <layer id="2" name="ground" width="30" height="20">
   <data encoding="csv">
 1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,

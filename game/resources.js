@@ -14,10 +14,10 @@ function tileset(basePath) {
     },
   ];
 }
-function map(basePath) {
+function map(basePath, name) {
   return [
     {
-      name: me.utils.file.getBasename(basePath),
+      name: name ?? me.utils.file.getBasename(basePath),
       type: "tmx",
       src: basePath + ".tmx",
     },
@@ -34,27 +34,35 @@ function image(basePath) {
 }
 
 export const hubWorldResources = [
+  ...map("maps/islands/plains-1", "islands/plains-1"),
   ...map("maps/iceland-test"),
   ...map("maps/minifantasy-dungeon"),
 
-  ...tileset("tilesets/Minifantasy_Walls"),
-  ...tileset("tilesets/Minifantasy_Dungeon/Minifantasy_DungeonCliffTiles"),
-  ...tileset("tilesets/Minifantasy_Dungeon/Minifantasy_DungeonDoorTiles"),
-  ...tileset("tilesets/Minifantasy_Dungeon/Minifantasy_DungeonFloorTiles"),
-  ...tileset("tilesets/Minifantasy_Dungeon/Minifantasy_DungeonProps"),
-  ...tileset("tilesets/Minifantasy_Dungeon/Minifantasy_DungeonPropsShadows"),
-  ...tileset("tilesets/Minifantasy_Dungeon/Minifantasy_DungeonWallTiles"),
-  ...tileset(
-    "tilesets/Minifantasy_Dungeon/Minifantasy_DungeonWallTilesetShadows"
-  ),
-  ...tileset('tilesets/Minifantasy_IcyWilderness/Minifantasy_IcyWildernessAllTiles'),
-  ...tileset('tilesets/Minifantasy_IcyWilderness/Minifantasy_IcyWildernessAllTilesShadows')
+  ...tileset("tilesets/Walls"),
+  // Dungeon
+  ...tileset("tilesets/Dungeon/DungeonCliffTiles"),
+  ...tileset("tilesets/Dungeon/DungeonDoorTiles"),
+  ...tileset("tilesets/Dungeon/DungeonFloorTiles"),
+  ...tileset("tilesets/Dungeon/DungeonProps"),
+  ...tileset("tilesets/Dungeon/DungeonPropsShadows"),
+  ...tileset("tilesets/Dungeon/DungeonWallTiles"),
+  ...tileset("tilesets/Dungeon/DungeonWallTilesetShadows"),
+  // IcyWilderness
+  ...tileset("tilesets/IcyWilderness/IcyWilderness_AllTiles"),
+  ...tileset("tilesets/IcyWilderness/IcyWilderness_AllTilesShadows"),
+
+  // ShipsAndDocks
+  ...tileset("tilesets/ShipsAndDocks/ShipsAndDocks_Docks"),
+
+  // ForgottenPlains
+  ...tileset("tilesets/ForgottenPlains/ForgottenPlainsTiles"),
+  ...tileset("tilesets/ForgottenPlains/ForgottenPlainsProps"),
 ];
 
 export const globalResources = [
   // player
-  ...image("sprites/Human/Minifantasy_CreaturesHumanBaseWalk"),
-  ...image("sprites/Human/Minifantasy_CreaturesHumanBaseAnimations"),
+  // ...image("sprites/Human/HumanBaseWalk"),
+  ...image("sprites/Human/HumanBaseAnimations"),
 
   // cursor
   { name: "cursor", type: "image", src: "sprites/cursor.png" },

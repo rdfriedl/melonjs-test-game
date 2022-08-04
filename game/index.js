@@ -10,7 +10,14 @@ window.me = me;
 
 me.device.onReady(() => {
   // initialize the display canvas once the device/browser is ready
-  if (!me.video.init(480, 256, { parent: "screen", scale: "auto" })) {
+  if (
+    !me.video.init(8 * 16 * 2, 8 * 9 * 2, {
+      parent: "screen",
+      scale: "auto",
+      scaleMethod: "fill-max",
+      consoleHeader: true,
+    })
+  ) {
     alert("Your browser does not support HTML5 canvas.");
     return;
   }
@@ -22,13 +29,21 @@ me.device.onReady(() => {
   // setup states
   me.state.set(me.state.PLAY, new PlayScreen());
 
+  // add a keyboard shortcut to toggle Fullscreen mode on/off
+  me.input.bindKey(me.input.KEY.F, "toggleFullscreen");
+  me.event.on(me.event.KEYDOWN, (action) => {
+    // toggle fullscreen on/off
+    if (action === "toggleFullscreen") {
+      me.device.requestFullscreen();
+    } else {
+      me.device.exitFullscreen();
+    }
+  });
+
   // load global game resources
   me.loader.preload(globalResources, () => {
     loadPack(hubWorldResources).then(() => {
-      me.state.change(me.state.PLAY, "minifantasy-dungeon");
+      me.state.change(me.state.PLAY, "islands/plains-1");
     });
   });
 });
-
-// loadWorld('QmQVWXNKRFBRvekRGh9SrFtffiL59Sk5nJag583N6y4y4z')
-// loadWorld('Qmdho6mNHEVeTDTHaXKY7Siq1eScpRwnaGRq2M6D2RC3gn')

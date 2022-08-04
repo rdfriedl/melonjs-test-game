@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.9" tiledversion="1.9.0" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="8" tileheight="8" infinite="0" nextlayerid="11" nextobjectid="22">
- <tileset firstgid="1" source="../tilesets/Minifantasy_IcyWilderness/Minifantasy_IcyWildernessAllTiles.tsx"/>
- <tileset firstgid="1901" source="../tilesets/Minifantasy_IcyWilderness/Minifantasy_IcyWildernessAllTilesShadows.tsx"/>
- <tileset firstgid="3801" source="../tilesets/Minifantasy_Walls.tsx"/>
+ <tileset firstgid="1" source="../tilesets/IcyWilderness/IcyWilderness_AllTiles.tsx"/>
+ <tileset firstgid="1901" source="../tilesets/IcyWilderness/IcyWilderness_AllTilesShadows.tsx"/>
+ <tileset firstgid="3801" source="../tilesets/Walls.tsx"/>
  <layer id="2" name="ground" width="30" height="20">
   <data encoding="csv">
 166,166,166,266,117,54,54,52,54,52,55,54,54,54,54,54,52,52,55,53,55,54,55,55,53,53,54,53,53,53,

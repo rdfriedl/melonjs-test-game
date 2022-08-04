@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.9" tiledversion="1.9.0" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="8" tileheight="8" infinite="0" nextlayerid="10" nextobjectid="1">
- <tileset firstgid="1" source="../tilesets/Minifantasy_Walls.tsx"/>
- <tileset firstgid="16" source="../tilesets/Minifantasy_Dungeon/Minifantasy_DungeonProps.tsx"/>
- <tileset firstgid="509" source="../tilesets/Minifantasy_Dungeon/Minifantasy_DungeonPropsShadows.tsx"/>
+ <tileset firstgid="1" source="../tilesets/Walls.tsx"/>
+ <tileset firstgid="16" source="../tilesets/Dungeon/DungeonProps.tsx"/>
+ <tileset firstgid="509" source="../tilesets/Dungeon/DungeonPropsShadows.tsx"/>
  <layer id="6" name="region" width="30" height="20">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
