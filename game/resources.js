@@ -53,6 +53,7 @@ export const hubWorldResources = [
 
   // ShipsAndDocks
   ...tileset("tilesets/ShipsAndDocks/ShipsAndDocks_Docks"),
+  ...tileset("tilesets/ShipsAndDocks/ShipsAndDocks_Props"),
 
   // ForgottenPlains
   ...tileset("tilesets/ForgottenPlains/ForgottenPlainsTiles"),
