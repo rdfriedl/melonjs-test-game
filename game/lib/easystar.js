@@ -1,1 +1,1 @@
-export * from "https://cdn.jsdelivr.net/npm/easystarjs/+esm";
+export * from "https://esm.run/easystarjs@0.4.4";

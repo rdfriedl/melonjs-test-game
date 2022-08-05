@@ -107,7 +107,6 @@
    <wangtile tileid="707" wangid="0,2,0,2,0,2,0,2"/>
    <wangtile tileid="708" wangid="0,4,0,4,0,2,0,2"/>
    <wangtile tileid="715" wangid="0,5,0,5,0,4,0,4"/>
-   <wangtile tileid="716" wangid="0,5,0,5,0,5,0,5"/>
    <wangtile tileid="717" wangid="0,4,0,4,0,5,0,5"/>
    <wangtile tileid="771" wangid="0,2,0,4,0,4,0,4"/>
    <wangtile tileid="772" wangid="0,2,0,4,0,4,0,2"/>
