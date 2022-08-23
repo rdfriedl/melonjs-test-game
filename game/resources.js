@@ -23,6 +23,9 @@ function map(basePath, name) {
     },
   ];
 }
+function dungeonMap(filename){
+  return map(`maps/dungeon/${filename}`, `dungeon/${filename}`)
+}
 function image(basePath) {
   return [
     {
@@ -34,7 +37,6 @@ function image(basePath) {
 }
 
 export const hubWorldResources = [
-  ...map("maps/islands/plains-1", "islands/plains-1"),
   ...map("maps/iceland-test"),
   ...map("maps/minifantasy-dungeon"),
 
@@ -60,6 +62,15 @@ export const hubWorldResources = [
   ...tileset("tilesets/ForgottenPlains/ForgottenPlainsProps"),
 ];
 
+export const islandMaps = [
+  ...map("maps/islands/plains-1", "islands/plains-1"),
+
+  ...dungeonMap("bottom-right-1"),
+  ...dungeonMap("bottom-top-1"),
+  ...dungeonMap("left-right-1"),
+  ...dungeonMap("left-up-right-1"),
+]
+
 export const globalResources = [
   // player
   // ...image("sprites/Human/HumanBaseWalk"),
@@ -67,4 +78,8 @@ export const globalResources = [
 
   // cursor
   { name: "cursor", type: "image", src: "sprites/cursor.png" },
+  { name: "tunnel", type: "image", src: "sprites/tunnel.png" },
+  { name: "teleporter", type: "image", src: "sprites/teleporter.png" },
+
+  ...islandMaps
 ];

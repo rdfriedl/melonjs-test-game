@@ -1,9 +1,10 @@
 import me from "./lib/melon.js";
 import { globalResources, hubWorldResources } from "./resources.js";
 import PlayerEntity from "../entities/player.js";
-import DoorEntity from "./entities/door.js";
 import PlayScreen from "./screens/play.js";
 import { loadPack } from "./services/resource-manager.js";
+import TeleporterEntity from "./entities/teleporter.js";
+import TunnelEntity from "./entities/tunnel.js";
 import "./services/world-manager.js";
 
 window.me = me;
@@ -24,7 +25,16 @@ me.device.onReady(() => {
 
   // setup game objects
   me.pool.register("Player", PlayerEntity);
-  me.pool.register("Door", DoorEntity);
+
+  // island doors
+  me.pool.register("tunnel", TunnelEntity);
+  me.pool.register("tel", TeleporterEntity);
+
+  // empty objects for dungeon doors
+  me.pool.register("up", me.Entity);
+  me.pool.register("down", me.Entity);
+  me.pool.register("right", me.Entity);
+  me.pool.register("left", me.Entity);
 
   // setup states
   me.state.set(me.state.PLAY, new PlayScreen());

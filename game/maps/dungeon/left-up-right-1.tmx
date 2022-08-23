@@ -90,10 +90,10 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="4" name="player">
-  <object id="2" name="Door" class="up" x="64" y="0" width="24" height="8"/>
-  <object id="3" name="Door" class="right" x="152" y="80" width="8" height="16"/>
-  <object id="5" name="Door" class="left" x="0" y="16" width="8" height="16"/>
+ <objectgroup id="4" name="connections">
+  <object id="2" name="up" x="64" y="0" width="24" height="8"/>
+  <object id="3" name="right" x="152" y="80" width="8" height="16"/>
+  <object id="5" name="left" x="0" y="16" width="8" height="16"/>
  </objectgroup>
  <layer id="3" name="above" width="20" height="24">
   <data encoding="csv">

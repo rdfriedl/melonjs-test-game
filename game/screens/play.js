@@ -8,6 +8,7 @@ import {
   getCellWalls,
   WALLS,
 } from "../services/pathfinder.js";
+import { NAV_LAYER } from "../const/map.js";
 
 class PlayScreen extends me.Stage {
   onResetEvent(mainMap) {
@@ -16,6 +17,8 @@ class PlayScreen extends me.Stage {
     this.cursor = new me.Sprite(0, 0, {
       image: "cursor",
       anchorPoint: { x: 0, y: 0 },
+      width: 8,
+      height: 8,
     });
     this.cursor.isPersistent = true;
     me.game.world.addChild(this.cursor);
@@ -80,7 +83,7 @@ class PlayScreen extends me.Stage {
       onLoaded: () => {
         const navLayer = me.level
           .getCurrentLevel()
-          .layers.find((layer) => layer.name === "nav");
+          .layers.find((layer) => layer.name === NAV_LAYER);
         if (navLayer) {
           navLayer.alpha = 0;
           loadWallsFromLayer(navLayer);

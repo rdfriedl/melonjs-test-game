@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.0" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="8" tileheight="8" infinite="0" nextlayerid="8" nextobjectid="3">
+<map version="1.9" tiledversion="1.9.0" orientation="orthogonal" renderorder="right-down" width="20" height="15" tilewidth="8" tileheight="8" infinite="0" nextlayerid="9" nextobjectid="6">
  <tileset firstgid="1" source="../../tilesets/Dungeon/DungeonFloorTiles.tsx"/>
  <tileset firstgid="15" source="../../tilesets/Dungeon/DungeonCliffTiles.tsx"/>
  <tileset firstgid="17" source="../../tilesets/Dungeon/DungeonWallTiles.tsx"/>
@@ -63,10 +63,11 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="4" name="player">
-  <object id="1" name="Door" class="right" x="152" y="32" width="8" height="16"/>
-  <object id="2" name="Door" class="down" x="56" y="112" width="24" height="8"/>
+ <objectgroup id="8" name="connections">
+  <object id="4" name="right" x="152" y="32" width="8" height="16"/>
+  <object id="5" name="down" x="56" y="112" width="24" height="8"/>
  </objectgroup>
+ <objectgroup id="4" name="player"/>
  <layer id="3" name="above" width="20" height="15">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
