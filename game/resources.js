@@ -23,8 +23,8 @@ function map(basePath, name) {
     },
   ];
 }
-function dungeonMap(filename){
-  return map(`maps/dungeon/${filename}`, `dungeon/${filename}`)
+function dungeonMap(filename) {
+  return map(`maps/dungeon/${filename}`, `dungeon/${filename}`);
 }
 function image(basePath) {
   return [
@@ -69,7 +69,7 @@ export const islandMaps = [
   ...dungeonMap("bottom-top-1"),
   ...dungeonMap("left-right-1"),
   ...dungeonMap("left-up-right-1"),
-]
+];
 
 export const globalResources = [
   // player
@@ -79,7 +79,8 @@ export const globalResources = [
   // cursor
   { name: "cursor", type: "image", src: "sprites/cursor.png" },
   { name: "tunnel", type: "image", src: "sprites/tunnel.png" },
+  { name: "sign", type: "image", src: "sprites/sign.png" },
   { name: "teleporter", type: "image", src: "sprites/teleporter.png" },
 
-  ...islandMaps
+  ...islandMaps,
 ];

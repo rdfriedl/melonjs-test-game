@@ -1,109 +1,44 @@
 import me from "../lib/melon.js";
 import * as EasyStar from "../lib/easystar.js";
+import { getCompiledGrid, indexToCell, WALLS } from "./navgrid.js";
 const { js: Grid } = EasyStar;
 
 function flipBits(v, mask) {
   return ~v & mask;
 }
 
-export const WALLS = {
-  EMPTY: 0,
-  RIGHT: 1,
-  BOTTOM: 2,
-  LEFT: 4,
-  TOP: 8,
-  ALL: 1 | 2 | 4 | 8,
-};
+function getCompiledGridInYX() {
+  const compiledGrid = getCompiledGrid();
+  const grid = [];
 
-function flipXYtoYX(arr) {
-  // flip the grid since tiled exports in x/y and the grid wants y/x
-  const newArr = [];
-  for (let x = 0; x < arr.length; x++) {
-    const column = arr[x];
-    for (let y = 0; y < column.length; y++) {
-      (newArr[y] = newArr[y] || [])[x] = column[y];
-    }
+  for (let i = 0; i < compiledGrid.length; i++) {
+    const { x, y } = indexToCell(i);
+    const walls = compiledGrid[i];
+
+    if (!grid[y]) grid[y] = [];
+    grid[y][x] = walls;
   }
-  return newArr;
+
+  return grid;
 }
 
-let columns = 0;
-let rows = 0;
-let walls = [];
 let grid = new Grid();
 // every combination except WALLS.ALL, which is 15
 grid.setAcceptableTiles(new Array(15).fill(0).map((_, i) => i));
 
-export function resetWalls(width, height) {
-  walls = [];
-  rows = height;
-  columns = width;
-  for (let y = 0; y < height; y++) {
-    walls[y] = [];
-    for (let x = 0; x < width; x++) {
-      walls[y][x] = WALLS.EMPTY;
-    }
-  }
-}
-export function getCellWalls(x, y) {
-  return walls[y]?.[x] ?? WALLS.EMPTY;
-}
-export function addCellWall(x, y, wall = WALLS.EMPTY) {
-  if (x < 0 || y < 0 || x >= columns || y >= rows) return;
-  walls[y][x] = (walls[y][x] ?? 0) | wall;
-}
-
-export function addWallsFromLayer(layer) {
-  for (let x = 0; x < layer.layerData.length; x++) {
-    const column = layer.layerData[x];
-    for (let y = 0; y < column.length; y++) {
-      addCellWall(x, y, WALLS.EMPTY);
-
-      const tile = column[y];
-      if (!tile) continue;
-      const props = tile.tileset.TileProperties[tile.tileId];
-      if (!props) continue;
-
-      if (props.right) {
-        addCellWall(x, y, WALLS.RIGHT);
-        addCellWall(x + 1, y, WALLS.LEFT);
-      }
-      if (props.left) {
-        addCellWall(x, y, WALLS.LEFT);
-        addCellWall(x - 1, y, WALLS.RIGHT);
-      }
-      if (props.bottom) {
-        addCellWall(x, y, WALLS.BOTTOM);
-        addCellWall(x, y + 1, WALLS.TOP);
-      }
-      if (props.top) {
-        addCellWall(x, y, WALLS.TOP);
-        addCellWall(x, y - 1, WALLS.BOTTOM);
-      }
-    }
-  }
-}
-
-export function loadWallsFromLayer(layer) {
-  if (!layer) return;
-
-  grid.removeAllDirectionalConditions();
-  resetWalls(layer.cols, layer.rows);
-  addWallsFromLayer(layer);
-  updateNavGrid();
-}
-
 export function updateNavGrid() {
+  const gridYX = getCompiledGridInYX();
+
   // import grid
-  grid.setGrid(walls);
+  grid.setGrid(gridYX);
 
   //set directional conditions
   grid.removeAllDirectionalConditions();
-  for (let y = 0; y < walls.length; y++) {
-    const row = walls[y];
+  for (let y = 0; y < gridYX.length; y++) {
+    const row = gridYX[y];
     for (let x = 0; x < row.length; x++) {
-      const cell = row[x];
-      const openings = flipBits(cell, WALLS.ALL);
+      const walls = row[x];
+      const openings = flipBits(walls, WALLS.ALL);
 
       const accessibleFrom = [];
       if (openings & WALLS.RIGHT) {
@@ -123,6 +58,7 @@ export function updateNavGrid() {
   }
 }
 
+// navigation methods
 export function findNavPath(start, end) {
   return new Promise((res) => {
     grid.findPath(end.x, end.y, start.x, start.y, (rawPoints) => {

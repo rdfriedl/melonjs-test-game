@@ -1,14 +1,20 @@
 import me from "../lib/melon.js";
 import PlayerEntity from "../entities/player.js";
 import {
-  loadWallsFromLayer,
   calculate as calculateLevelNav,
   findNavPath,
   convertPathToLevelCords,
-  getCellWalls,
-  WALLS,
+  updateNavGrid,
 } from "../services/pathfinder.js";
 import { NAV_LAYER } from "../const/map.js";
+import { getCellInteraction } from "../services/interactions.js";
+import {
+  WALLS,
+  getCellWalls,
+  setGridSize,
+  setWallsFromTmxLayer,
+} from "../services/navgrid.js";
+import { NAV_LAYERS } from "../const/nav.js";
 
 class PlayScreen extends me.Stage {
   onResetEvent(mainMap) {
@@ -38,7 +44,7 @@ class PlayScreen extends me.Stage {
           cord.y * level.tileheight
         );
 
-        const walls = getCellWalls(cord.x, cord.y);
+        const walls = getCellWalls(cord);
 
         if (walls !== WALLS.ALL) {
           this.cursor.tint.setColor(255, 255, 255);
@@ -64,11 +70,16 @@ class PlayScreen extends me.Stage {
             player.pos.y
           );
 
-          const walls = getCellWalls(targetCell.x, targetCell.y);
+          const walls = getCellWalls(targetCell);
           if (walls === WALLS.ALL) return;
 
           const navPath = await findNavPath(playerCell, targetCell);
           player.setNavPath(convertPathToLevelCords(navPath));
+
+          const interaction = getCellInteraction(targetCell);
+          if (interaction) {
+            interaction.callback();
+          }
         }
       }
     );
@@ -78,16 +89,33 @@ class PlayScreen extends me.Stage {
     me.event.on(me.event.GAME_UPDATE, this.onGameUpdate, this);
   }
 
-  loadLevel(name = "hub") {
-    me.level.load(name || "hub", {
+  loadLevel(name) {
+    if (!name) throw new Error("no level name");
+
+    const tmx = me.loader.getTMX(name);
+    const levelSize = new me.Vector2d(
+      parseInt(tmx.width),
+      parseInt(tmx.height)
+    );
+
+    // resize the nav grid
+    setGridSize(levelSize);
+
+    // load the level
+    me.level.load(name, {
       onLoaded: () => {
+        // find the map nav layer
         const navLayer = me.level
           .getCurrentLevel()
           .layers.find((layer) => layer.name === NAV_LAYER);
+
         if (navLayer) {
           navLayer.alpha = 0;
-          loadWallsFromLayer(navLayer);
+          setWallsFromTmxLayer(NAV_LAYERS.MAP_NAV, navLayer);
         }
+
+        // update the nav grid
+        updateNavGrid();
 
         // move the cursor to the top
         setTimeout(() => {

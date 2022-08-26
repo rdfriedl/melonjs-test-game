@@ -5,9 +5,10 @@ import PlayScreen from "./screens/play.js";
 import { loadPack } from "./services/resource-manager.js";
 import TeleporterEntity from "./entities/teleporter.js";
 import TunnelEntity from "./entities/tunnel.js";
+import SignEntity from "./entities/sign.js";
 import "./services/world-manager.js";
 
-window.me = me;
+import "./debug.js";
 
 me.device.onReady(() => {
   // initialize the display canvas once the device/browser is ready
@@ -25,6 +26,7 @@ me.device.onReady(() => {
 
   // setup game objects
   me.pool.register("Player", PlayerEntity);
+  me.pool.register("sign", SignEntity);
 
   // island doors
   me.pool.register("tunnel", TunnelEntity);
