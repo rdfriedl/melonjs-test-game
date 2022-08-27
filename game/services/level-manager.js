@@ -1,5 +1,6 @@
 import { NAV_LAYER } from "../const/map.js";
 import { NAV_LAYERS } from "../const/nav.js";
+import { getNodeChannels } from "./amboss.js";
 import { setGridSize, setWallsFromTmxLayer } from "./navgrid.js";
 import { updateNavGrid } from "./pathfinder.js";
 
@@ -29,4 +30,18 @@ export function loadLevel(name) {
       updateNavGrid();
     },
   });
+}
+
+class World {
+  constructor(pubKey) {
+    this.pubKey = pubKey;
+    this.loaded = false;
+    this.channels = [];
+  }
+}
+
+class Channel {
+  constructor(longId, nodeA, nodeB) {
+    this.id = longId;
+  }
 }
