@@ -135,6 +135,7 @@ export default class PlayerEntity extends me.Sprite {
 
   setNavPath(path) {
     this.navPath = path ?? [];
+    this.goToPos = null;
     this.onStartNavPath(this.navPath);
   }
 
