@@ -64,6 +64,7 @@ export const hubWorldResources = [
 
 export const islandMaps = [
   ...map("maps/islands/plains-1", "islands/plains-1"),
+  ...map("maps/islands/small", "islands/small"),
 
   ...dungeonMap("bottom-right-1"),
   ...dungeonMap("bottom-top-1"),

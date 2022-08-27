@@ -15,7 +15,7 @@ const getKey = (v) => [v.x, v.y].join(",");
 export function clearAllInteractions() {
   cells.clear();
 }
-export function clearInteractions(v) {
+export function clearInteraction(v) {
   cells.delete(getKey(v));
 }
 

@@ -9,6 +9,7 @@ import SignEntity from "./entities/sign.js";
 import "./services/world-manager.js";
 
 import "./debug.js";
+import { loadLevel } from "./services/level-manager.js";
 
 me.device.onReady(() => {
   // initialize the display canvas once the device/browser is ready
@@ -55,7 +56,8 @@ me.device.onReady(() => {
   // load global game resources
   me.loader.preload(globalResources, () => {
     loadPack(hubWorldResources).then(() => {
-      me.state.change(me.state.PLAY, "islands/plains-1");
+      me.state.change(me.state.PLAY);
+      loadLevel("islands/plains-1");
     });
   });
 });

@@ -4,20 +4,12 @@ import {
   calculate as calculateLevelNav,
   findNavPath,
   convertPathToLevelCords,
-  updateNavGrid,
 } from "../services/pathfinder.js";
-import { NAV_LAYER } from "../const/map.js";
-import { getCellInteraction } from "../services/interactions.js";
-import {
-  WALLS,
-  getCellWalls,
-  setGridSize,
-  setWallsFromTmxLayer,
-} from "../services/navgrid.js";
-import { NAV_LAYERS } from "../const/nav.js";
+import { GRID } from "../const/map.js";
+import { WALLS, getCellWalls } from "../services/navgrid.js";
 
 class PlayScreen extends me.Stage {
-  onResetEvent(mainMap) {
+  onResetEvent() {
     me.game.world.gravity.set(0, 0);
 
     this.cursor = new me.Sprite(0, 0, {
@@ -34,15 +26,11 @@ class PlayScreen extends me.Stage {
       "pointermove",
       me.game.viewport,
       (event) => {
-        const level = me.level.getCurrentLevel();
         const cord = this.getNavCellFromGlobalCord(
           event.gameWorldX,
           event.gameWorldY
         );
-        this.cursor.pos.set(
-          cord.x * level.tilewidth,
-          cord.y * level.tileheight
-        );
+        this.cursor.pos.set(cord.x * GRID, cord.y * GRID);
 
         const walls = getCellWalls(cord);
 
@@ -65,64 +53,18 @@ class PlayScreen extends me.Stage {
             event.gameWorldX,
             event.gameWorldY
           );
-          const playerCell = this.getNavCellFromGlobalCord(
-            player.pos.x,
-            player.pos.y
-          );
+          const playerCell = player.cell.clone();
 
           const walls = getCellWalls(targetCell);
           if (walls === WALLS.ALL) return;
 
           const navPath = await findNavPath(playerCell, targetCell);
           player.setNavPath(convertPathToLevelCords(navPath));
-
-          const interaction = getCellInteraction(targetCell);
-          if (interaction) {
-            interaction.callback();
-          }
         }
       }
     );
 
-    this.loadLevel(mainMap);
-
     me.event.on(me.event.GAME_UPDATE, this.onGameUpdate, this);
-  }
-
-  loadLevel(name) {
-    if (!name) throw new Error("no level name");
-
-    const tmx = me.loader.getTMX(name);
-    const levelSize = new me.Vector2d(
-      parseInt(tmx.width),
-      parseInt(tmx.height)
-    );
-
-    // resize the nav grid
-    setGridSize(levelSize);
-
-    // load the level
-    me.level.load(name, {
-      onLoaded: () => {
-        // find the map nav layer
-        const navLayer = me.level
-          .getCurrentLevel()
-          .layers.find((layer) => layer.name === NAV_LAYER);
-
-        if (navLayer) {
-          navLayer.alpha = 0;
-          setWallsFromTmxLayer(NAV_LAYERS.MAP_NAV, navLayer);
-        }
-
-        // update the nav grid
-        updateNavGrid();
-
-        // move the cursor to the top
-        setTimeout(() => {
-          me.game.world.moveToTop(this.cursor);
-        }, 100);
-      },
-    });
   }
 
   getPlayer() {
@@ -130,14 +72,13 @@ class PlayScreen extends me.Stage {
   }
 
   getNavCellFromGlobalCord(x, y) {
-    const level = me.level.getCurrentLevel();
-    return new me.Vector2d(
-      Math.floor(x / level.tilewidth),
-      Math.floor(y / level.tileheight)
-    );
+    return new me.Vector2d(Math.floor(x / GRID), Math.floor(y / GRID));
   }
 
   onGameUpdate() {
+    // TODO: find a getter way to keep the cursor above the map
+    me.game.world.moveToTop(this.cursor);
+
     calculateLevelNav();
   }
 

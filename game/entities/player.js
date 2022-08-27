@@ -1,4 +1,6 @@
+import { SnappedVec2d } from "../helpers/snapped-vec-2d.js";
 import me from "../lib/melon.js";
+import { getCellInteraction } from "../services/interactions.js";
 // import { loadIpfsWorld } from "../services/world-manager.js";
 // import DoorEntity from "./door.js";
 
@@ -46,6 +48,8 @@ export default class PlayerEntity extends me.Sprite {
 
     this.navPath = [];
     this.goToPos = null;
+
+    this.cell = new SnappedVec2d(this.pos);
   }
 
   setCurrentAnimationIfNotSet(animation) {
@@ -82,6 +86,10 @@ export default class PlayerEntity extends me.Sprite {
         this.pos.setV(this.goToPos);
         this.goToPos = null;
         this.setAction("idle");
+
+        if (this.navPath.length === 0) {
+          this.onCompleteNavPath();
+        }
       } else {
         this.pos.add(vel);
         this.setAction("walk");
@@ -127,11 +135,18 @@ export default class PlayerEntity extends me.Sprite {
 
   setNavPath(path) {
     this.navPath = path ?? [];
+    this.onStartNavPath(this.navPath);
   }
 
-  /**
-   * colision handler
-   */
+  onStartNavPath() {}
+  onCompleteNavPath() {
+    const interaction = getCellInteraction(this.cell);
+
+    if (interaction) {
+      interaction.callback();
+    }
+  }
+
   // onCollision(response, other) {
   //   if (other instanceof DoorEntity) {
   //     if(other.loadWorld){
