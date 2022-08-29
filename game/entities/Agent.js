@@ -3,6 +3,12 @@ import { SnappedVec2d } from "../helpers/snapped-vec-2d.js";
 import { GRID } from "../const/grid.js";
 import { canMoveTo } from "../services/navgrid.js";
 import CharacterWalkSprite from "./CharacterWalkSprite.js";
+import {
+  DIRECTION_TO_SIDE,
+  getCellInteraction,
+  INTERACTION_SIDE,
+} from "../services/interactions.js";
+import { DIRECTION } from "../const/direction.js";
 
 const MOVE_SPEED = GRID / 12;
 const halfGrid = new me.Vector2d(GRID, GRID).scale(0.5);
@@ -26,12 +32,12 @@ function moveVec2d(vec, to, speed) {
   return new me.Vector2d(Math.sign(diff.x), Math.sign(diff.y));
 }
 
-const INPUT_DIRECTIONS = {
-  none: new me.Vector2d(0, 0),
-  up: new me.Vector2d(0, -1),
-  left: new me.Vector2d(-1, 0),
-  down: new me.Vector2d(0, 1),
-  right: new me.Vector2d(1, 0),
+const INPUT_DIRECTION = {
+  none: DIRECTION.NONE,
+  up: DIRECTION.UP,
+  left: DIRECTION.LEFT,
+  down: DIRECTION.DOWN,
+  right: DIRECTION.RIGHT,
 };
 
 export default class AgentEntity extends me.Entity {
@@ -46,6 +52,7 @@ export default class AgentEntity extends me.Entity {
       image: "HumanBaseAnimations",
     });
 
+    this.facingDirection = INPUT_DIRECTION.down;
     this.inputDirStack = [];
     this.renderable = this.walk;
 
@@ -57,10 +64,12 @@ export default class AgentEntity extends me.Entity {
     this.cell = new SnappedVec2d(this.pos);
     this.moveToCell = new me.Vector2d().copy(this.cell);
     this.targetCell = new me.Vector2d().copy(this.cell);
+
+    this._interactionDown = false;
   }
 
   getInputDirection() {
-    for (const [key, dir] of Object.entries(INPUT_DIRECTIONS)) {
+    for (const [key, dir] of Object.entries(INPUT_DIRECTION)) {
       if (me.input.isKeyPressed(key)) {
         if (!this.inputDirStack.includes(key)) {
           this.inputDirStack.push(key);
@@ -69,16 +78,30 @@ export default class AgentEntity extends me.Entity {
         this.inputDirStack.splice(this.inputDirStack.indexOf(key), 1);
       }
     }
-    console.log(this.inputDirStack);
 
     return (
-      INPUT_DIRECTIONS[this.inputDirStack[this.inputDirStack.length - 1]] ??
-      INPUT_DIRECTIONS.none
+      INPUT_DIRECTION[this.inputDirStack[this.inputDirStack.length - 1]] ??
+      INPUT_DIRECTION.none
     );
+  }
+
+  interact() {
+    const side = DIRECTION_TO_SIDE[this.facingDirection.clone().scale(-1)];
+    const interaction =
+      getCellInteraction(this.cell.clone().add(this.facingDirection), side) ||
+      getCellInteraction(this.cell, INTERACTION_SIDE.UNDER);
+    if (interaction) {
+      interaction.callback();
+    }
   }
 
   update(dt) {
     const inputDir = this.getInputDirection();
+
+    // update facing dir
+    if (inputDir !== INPUT_DIRECTION.none) {
+      this.facingDirection = inputDir;
+    }
 
     const moveToPos = this.moveToCell.clone().scale(GRID).add(halfGrid);
     const distance = new me.Vector2d().copy(this.pos).distance(moveToPos);
@@ -111,6 +134,11 @@ export default class AgentEntity extends me.Entity {
 
     const moved = moveVec2d(this.pos, moveToPos, MOVE_SPEED);
     this.walk.moved.copy(moved);
+
+    if (!this._interactionDown && me.input.isKeyPressed("confirm")) {
+      this.interact();
+    }
+    this._interactionDown = me.input.isKeyPressed("confirm");
 
     super.update(dt);
     return true;

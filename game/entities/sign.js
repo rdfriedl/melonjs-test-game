@@ -3,7 +3,7 @@ import { GRID } from "../const/grid.js";
 import {
   clearInteraction,
   setCellInteraction,
-  SIDES,
+  INTERACTION_SIDE,
 } from "../services/interactions.js";
 import { addCellWall, WALLS } from "../services/navgrid.js";
 import { NAV_LAYERS } from "../const/nav.js";
@@ -17,7 +17,7 @@ export default class SignEntity extends me.Sprite {
 
     this.cell = new me.Vector2d(x, y).div(GRID).floor();
 
-    setCellInteraction(this.cell, SIDES.ALL, () => alert("hello world"));
+    setCellInteraction(this.cell, INTERACTION_SIDE.ALL, () => console.info("sign"));
     addCellWall(this.cell, NAV_LAYERS.SIGNS, WALLS.ALL);
   }
 
