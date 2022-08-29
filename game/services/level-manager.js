@@ -1,6 +1,6 @@
+import me from "../lib/melon.js";
 import { NAV_LAYER } from "../const/map.js";
 import { NAV_LAYERS } from "../const/nav.js";
-import { getNodeChannels } from "./amboss.js";
 import { setGridSize, setWallsFromTmxLayer } from "./navgrid.js";
 import { updateNavGrid } from "./pathfinder.js";
 
@@ -14,7 +14,10 @@ export function loadLevel(name) {
   setGridSize(levelSize);
 
   // load the level
+  const mapContainer = new me.Container(0, 0);
   me.level.load(name, {
+    // container: mapContainer,
+    flatten: false,
     onLoaded: () => {
       // find the map nav layer
       const navLayer = me.level
@@ -28,6 +31,9 @@ export function loadLevel(name) {
 
       // update the nav grid
       updateNavGrid();
+
+      mapContainer.currentTransform.scale(1);
+      me.game.world.addChild(mapContainer);
     },
   });
 }

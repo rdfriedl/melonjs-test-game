@@ -1,12 +1,21 @@
 import { base64ToUint8Array } from "../helpers/base64.js";
 import pako from "./pako.js";
 
-// this file was copied from https://esm.run/melonjs@13
+// this file was copied from https://unpkg.com/browse/melonjs@13.3.0/dist/melonjs.module.js
 // and then modified to support zlib compression on tilemaps
 // the only thing changes is the "decode" method
 
+//     case "base64":
+//       // NOTE: changed to support zlib compression
+//       switch (compression) {
+//         case "none":
+//           return decodeBase64AsArray(data, 4);
+//         case "zlib":
+//           return new Uint32Array(pako.inflate(base64ToUint8Array(data)).buffer);
+//       }
+
 /*!
- * melonJS Game Engine - v13.0.0
+ * melonJS Game Engine - v13.3.0
  * http://www.melonjs.org
  * melonjs is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -161,12 +170,20 @@ var indexedObject = fails$6(function () {
     }
   : $Object$3;
 
+// we can't use just `it == null` since of `document.all` special case
+// https://tc39.es/ecma262/#sec-IsHTMLDDA-internal-slot-aec
+var isNullOrUndefined$2 = function (it) {
+  return it === null || it === undefined;
+};
+
+var isNullOrUndefined$1 = isNullOrUndefined$2;
+
 var $TypeError$5 = TypeError;
 
 // `RequireObjectCoercible` abstract operation
 // https://tc39.es/ecma262/#sec-requireobjectcoercible
 var requireObjectCoercible$3 = function (it) {
-  if (it == undefined) throw $TypeError$5("Can't call method on " + it);
+  if (isNullOrUndefined$1(it)) throw $TypeError$5("Can't call method on " + it);
   return it;
 };
 
@@ -186,9 +203,21 @@ var isCallable$b = function (argument) {
 
 var isCallable$a = isCallable$b;
 
-var isObject$5 = function (it) {
-  return typeof it == "object" ? it !== null : isCallable$a(it);
-};
+var documentAll = typeof document == "object" && document.all;
+
+// https://tc39.es/ecma262/#sec-IsHTMLDDA-internal-slot
+var SPECIAL_DOCUMENT_ALL =
+  typeof documentAll == "undefined" && documentAll !== undefined;
+
+var isObject$5 = SPECIAL_DOCUMENT_ALL
+  ? function (it) {
+      return typeof it == "object"
+        ? it !== null
+        : isCallable$a(it) || it === documentAll;
+    }
+  : function (it) {
+      return typeof it == "object" ? it !== null : isCallable$a(it);
+    };
 
 var global$b = global$c;
 var isCallable$9 = isCallable$b;
@@ -245,7 +274,7 @@ var V8_VERSION = engineV8Version;
 var fails$5 = fails$9;
 
 // eslint-disable-next-line es-x/no-object-getownpropertysymbols -- required for testing
-var nativeSymbol =
+var symbolConstructorDetection =
   !!Object.getOwnPropertySymbols &&
   !fails$5(function () {
     var symbol = Symbol();
@@ -261,7 +290,7 @@ var nativeSymbol =
 
 /* eslint-disable es-x/no-symbol -- required for testing */
 
-var NATIVE_SYMBOL$1 = nativeSymbol;
+var NATIVE_SYMBOL$1 = symbolConstructorDetection;
 
 var useSymbolAsUid =
   NATIVE_SYMBOL$1 && !Symbol.sham && typeof Symbol.iterator == "symbol";
@@ -306,12 +335,13 @@ var aCallable$1 = function (argument) {
 };
 
 var aCallable = aCallable$1;
+var isNullOrUndefined = isNullOrUndefined$2;
 
 // `GetMethod` abstract operation
 // https://tc39.es/ecma262/#sec-getmethod
 var getMethod$1 = function (V, P) {
   var func = V[P];
-  return func == null ? undefined : aCallable(func);
+  return isNullOrUndefined(func) ? undefined : aCallable(func);
 };
 
 var call$2 = functionCall;
@@ -377,10 +407,10 @@ var store$2 = sharedStore;
 (shared$3.exports = function (key, value) {
   return store$2[key] || (store$2[key] = value !== undefined ? value : {});
 })("versions", []).push({
-  version: "3.23.5",
+  version: "3.25.0",
   mode: "global",
   copyright: "© 2014-2022 Denis Pushkarev (zloirock.ru)",
-  license: "https://github.com/zloirock/core-js/blob/v3.23.5/LICENSE",
+  license: "https://github.com/zloirock/core-js/blob/v3.25.0/LICENSE",
   source: "https://github.com/zloirock/core-js",
 });
 
@@ -427,7 +457,7 @@ var global$7 = global$c;
 var shared$2 = shared$3.exports;
 var hasOwn$6 = hasOwnProperty_1;
 var uid$1 = uid$2;
-var NATIVE_SYMBOL = nativeSymbol;
+var NATIVE_SYMBOL = symbolConstructorDetection;
 var USE_SYMBOL_AS_UID = useSymbolAsUid;
 
 var WellKnownSymbolsStore = shared$2("wks");
@@ -709,16 +739,15 @@ if (!isCallable$5(store$1.inspectSource)) {
   };
 }
 
-var inspectSource$2 = store$1.inspectSource;
+var inspectSource$1 = store$1.inspectSource;
 
 var global$5 = global$c;
 var isCallable$4 = isCallable$b;
-var inspectSource$1 = inspectSource$2;
 
 var WeakMap$1 = global$5.WeakMap;
 
-var nativeWeakMap =
-  isCallable$4(WeakMap$1) && /native code/.test(inspectSource$1(WeakMap$1));
+var weakMapBasicDetection =
+  isCallable$4(WeakMap$1) && /native code/.test(String(WeakMap$1));
 
 var shared$1 = shared$3.exports;
 var uid = uid$2;
@@ -731,7 +760,7 @@ var sharedKey$1 = function (key) {
 
 var hiddenKeys$3 = {};
 
-var NATIVE_WEAK_MAP = nativeWeakMap;
+var NATIVE_WEAK_MAP = weakMapBasicDetection;
 var global$4 = global$c;
 var uncurryThis$4 = functionUncurryThis;
 var isObject = isObject$5;
@@ -766,7 +795,7 @@ if (NATIVE_WEAK_MAP || shared.state) {
   var wmhas = uncurryThis$4(store.has);
   var wmset = uncurryThis$4(store.set);
   set = function (it, metadata) {
-    if (wmhas(store, it)) throw new TypeError$1(OBJECT_ALREADY_INITIALIZED);
+    if (wmhas(store, it)) throw TypeError$1(OBJECT_ALREADY_INITIALIZED);
     metadata.facade = it;
     wmset(store, it, metadata);
     return metadata;
@@ -781,7 +810,7 @@ if (NATIVE_WEAK_MAP || shared.state) {
   var STATE = sharedKey("state");
   hiddenKeys$2[STATE] = true;
   set = function (it, metadata) {
-    if (hasOwn$3(it, STATE)) throw new TypeError$1(OBJECT_ALREADY_INITIALIZED);
+    if (hasOwn$3(it, STATE)) throw TypeError$1(OBJECT_ALREADY_INITIALIZED);
     metadata.facade = it;
     createNonEnumerableProperty$1(it, STATE, metadata);
     return metadata;
@@ -807,7 +836,7 @@ var isCallable$3 = isCallable$b;
 var hasOwn$2 = hasOwnProperty_1;
 var DESCRIPTORS = descriptors;
 var CONFIGURABLE_FUNCTION_NAME = functionName.CONFIGURABLE;
-var inspectSource = inspectSource$2;
+var inspectSource = inspectSource$1;
 var InternalStateModule = internalState;
 
 var enforceInternalState = InternalStateModule.enforce;
@@ -2608,6 +2637,29 @@ class Vector2d {
   }
 
   /**
+   * interpolate the position of this vector towards the given one by the given maximum step.
+   * @name moveTowards
+   * @memberof Vector2d
+   * @param {Vector2d} target
+   * @param {number} step the maximum step per iteration (Negative values will push the vector away from the target)
+   * @returns {Vector2d} Reference to this object for method chaining
+   */
+  moveTowards(target, step) {
+    var angle = Math.atan2(target.y - this.y, target.x - this.x);
+
+    var distance = this.distance(target);
+
+    if (distance === 0 || (step >= 0 && distance <= step * step)) {
+      return target;
+    }
+
+    this.x += Math.cos(angle) * step;
+    this.y += Math.sin(angle) * step;
+
+    return this;
+  }
+
+  /**
    * return the distance between this vector and the passed one
    * @name distance
    * @memberof Vector2d
@@ -2676,12 +2728,20 @@ class Vector2d {
 }
 
 // convert a give color component to it hexadecimal value
-var toHex = function (component) {
+function toHex(component) {
   return (
     "0123456789ABCDEF".charAt((component - (component % 16)) >> 4) +
     "0123456789ABCDEF".charAt(component % 16)
   );
-};
+}
+function hue2rgb(p, q, t) {
+  if (t < 0) t += 1;
+  if (t > 1) t -= 1;
+  if (t < 1 / 6) return p + (q - p) * 6 * t;
+  if (t < 1 / 2) return q;
+  if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+  return p;
+}
 
 const rgbaRx = /^rgba?\((\d+), ?(\d+), ?(\d+)(, ?([\d\.]+))?\)$/;
 const hex3Rx = /^#([\da-fA-F])([\da-fA-F])([\da-fA-F])$/;
@@ -2877,7 +2937,6 @@ class Color {
   /**
    * Color Red Component [0 .. 255]
    * @type {number}
-   * @memberof Color
    */
   get r() {
     return ~~(this.glArray[0] * 255);
@@ -2890,7 +2949,6 @@ class Color {
   /**
    * Color Green Component [0 .. 255]
    * @type {number}
-   * @memberof Color
    */
   get g() {
     return ~~(this.glArray[1] * 255);
@@ -2903,7 +2961,6 @@ class Color {
   /**
    * Color Blue Component [0 .. 255]
    * @type {number}
-   * @memberof Color
    */
   get b() {
     return ~~(this.glArray[2] * 255);
@@ -2915,7 +2972,6 @@ class Color {
   /**
    * Color Alpha Component [0.0 .. 1.0]
    * @type {number}
-   * @memberof Color
    */
   get alpha() {
     return this.glArray[3];
@@ -2928,8 +2984,6 @@ class Color {
 
   /**
    * Set this color to the specified value.
-   * @name setColor
-   * @memberof Color
    * @param {number} r red component [0 .. 255]
    * @param {number} g green component [0 .. 255]
    * @param {number} b blue component [0 .. 255]
@@ -2945,9 +2999,70 @@ class Color {
   }
 
   /**
+   * set this color to the specified HSV value
+   * @param {number} h hue (a value from 0 to 1)
+   * @param {number} s saturation (a value from 0 to 1)
+   * @param {number} v value (a value from 0 to 1)
+   * @returns {Color} Reference to this object for method chaining
+   */
+  setHSV(h, s, v) {
+    var r, g, b;
+
+    var i = Math.floor(h * 6);
+    var f = h * 6 - i;
+    var p = v * (1 - s);
+    var q = v * (1 - f * s);
+    var t = v * (1 - (1 - f) * s);
+
+    switch (i % 6) {
+      case 0:
+        (r = v), (g = t), (b = p);
+        break;
+      case 1:
+        (r = q), (g = v), (b = p);
+        break;
+      case 2:
+        (r = p), (g = v), (b = t);
+        break;
+      case 3:
+        (r = p), (g = q), (b = v);
+        break;
+      case 4:
+        (r = t), (g = p), (b = v);
+        break;
+      case 5:
+        (r = v), (g = p), (b = q);
+        break;
+    }
+    return this.setColor(r * 255, g * 255, b * 255);
+  }
+
+  /**
+   * set this color to the specified HSL value
+   * @param {number} h hue (a value from 0 to 1)
+   * @param {number} s saturation (a value from 0 to 1)
+   * @param {number} l lightness (a value from 0 to 1)
+   * @returns {Color} Reference to this object for method chaining
+   */
+  setHSL(h, s, l) {
+    var r, g, b;
+
+    if (s === 0) {
+      r = g = b = l; // achromatic
+    } else {
+      var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      var p = 2 * l - q;
+
+      r = hue2rgb(p, q, h + 1 / 3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1 / 3);
+    }
+
+    return this.setColor(r * 255, g * 255, b * 255);
+  }
+
+  /**
    * Create a new copy of this color object.
-   * @name clone
-   * @memberof Color
    * @returns {Color} Reference to the newly cloned object
    */
   clone() {
@@ -2956,8 +3071,6 @@ class Color {
 
   /**
    * Copy a color object or CSS color into this one.
-   * @name copy
-   * @memberof Color
    * @param {Color|string} color
    * @returns {Color} Reference to this object for method chaining
    */
@@ -2972,8 +3085,6 @@ class Color {
 
   /**
    * Blend this color with the given one using addition.
-   * @name add
-   * @memberof Color
    * @param {Color} color
    * @returns {Color} Reference to this object for method chaining
    */
@@ -2988,8 +3099,6 @@ class Color {
 
   /**
    * Darken this color value by 0..1
-   * @name darken
-   * @memberof Color
    * @param {number} scale
    * @returns {Color} Reference to this object for method chaining
    */
@@ -3004,8 +3113,6 @@ class Color {
 
   /**
    * Linearly interpolate between this color and the given one.
-   * @name lerp
-   * @memberof Color
    * @param {Color} color
    * @param {number} alpha with alpha = 0 being this color, and alpha = 1 being the given one.
    * @returns {Color} Reference to this object for method chaining
@@ -3021,8 +3128,6 @@ class Color {
 
   /**
    * Lighten this color value by 0..1
-   * @name lighten
-   * @memberof Color
    * @param {number} scale
    * @returns {Color} Reference to this object for method chaining
    */
@@ -3049,8 +3154,6 @@ class Color {
 
   /**
    * Generate random r,g,b values for this color object
-   * @name random
-   * @memberof Color
    * @param {number} [min=0] minimum value for the random range
    * @param {number} [max=255] maxmium value for the random range
    * @returns {Color} Reference to this object for method chaining
@@ -3074,8 +3177,6 @@ class Color {
   /**
    * Return true if the r,g,b,a values of this color are equal with the
    * given one.
-   * @name equals
-   * @memberof Color
    * @param {Color} color
    * @returns {boolean}
    */
@@ -3091,8 +3192,6 @@ class Color {
   /**
    * Parse a CSS color string and set this color to the corresponding
    * r,g,b values
-   * @name parseCSS
-   * @memberof Color
    * @param {string} cssColor
    * @returns {Color} Reference to this object for method chaining
    */
@@ -3108,8 +3207,6 @@ class Color {
 
   /**
    * Parse an RGB or RGBA CSS color string
-   * @name parseRGB
-   * @memberof Color
    * @param {string} rgbColor
    * @returns {Color} Reference to this object for method chaining
    */
@@ -3127,8 +3224,6 @@ class Color {
   /**
    * Parse a Hex color ("#RGB", "#RGBA" or "#RRGGBB", "#RRGGBBAA" format) and set this color to
    * the corresponding r,g,b,a values
-   * @name parseHex
-   * @memberof Color
    * @param {string} hexColor
    * @param {boolean} [argb = false] true if format is #ARGB, or #AARRGGBB (as opposed to #RGBA or #RGGBBAA)
    * @returns {Color} Reference to this object for method chaining
@@ -3186,12 +3281,10 @@ class Color {
 
   /**
    * Pack this color into a Uint32 ARGB representation
-   * @name toUint32
-   * @memberof Color
    * @param {number} [alpha=1.0] alpha value [0.0 .. 1.0]
    * @returns {number}
    */
-  toUint32(alpha = this.alpha) {
+  toUint32(alpha = 1.0) {
     var ur = this.r & 0xff;
     var ug = this.g & 0xff;
     var ub = this.b & 0xff;
@@ -3202,8 +3295,6 @@ class Color {
 
   /**
    * return an array representation of this object
-   * @name toArray
-   * @memberof Color
    * @returns {Float32Array}
    */
   toArray() {
@@ -3211,9 +3302,7 @@ class Color {
   }
 
   /**
-   * Get the color in "#RRGGBB" format
-   * @name toHex
-   * @memberof Color
+   * return the color in "#RRGGBB" format
    * @returns {string}
    */
   toHex() {
@@ -3225,8 +3314,6 @@ class Color {
 
   /**
    * Get the color in "#RRGGBBAA" format
-   * @name toHex8
-   * @memberof Color
    * @returns {string}
    */
   toHex8(alpha = this.alpha) {
@@ -3240,8 +3327,6 @@ class Color {
 
   /**
    * Get the color in "rgb(R,G,B)" format
-   * @name toRGB
-   * @memberof Color
    * @returns {string}
    */
   toRGB() {
@@ -3253,8 +3338,6 @@ class Color {
 
   /**
    * Get the color in "rgba(R,G,B,A)" format
-   * @name toRGBA
-   * @memberof Color
    * @param {number} [alpha=1.0] alpha value [0.0 .. 1.0]
    * @returns {string}
    */
@@ -6989,19 +7072,13 @@ class GLShader {
   constructor(gl, vertex, fragment, precision) {
     /**
      * the active gl rendering context
-     * @public
      * @type {WebGLRenderingContext}
-     * @name gl
-     * @memberof GLShader
      */
     this.gl = gl;
 
     /**
      * the vertex shader source code
-     * @public
      * @type {string}
-     * @name vertex
-     * @memberof GLShader
      */
     this.vertex = setPrecision(
       minify(vertex),
@@ -7010,10 +7087,7 @@ class GLShader {
 
     /**
      * the fragment shader source code
-     * @public
      * @type {string}
-     * @name vertex
-     * @memberof GLShader
      */
     this.fragment = setPrecision(
       minify(fragment),
@@ -7022,19 +7096,13 @@ class GLShader {
 
     /**
      * the location attributes of the shader
-     * @public
      * @type {GLint[]}
-     * @name attributes
-     * @memberof GLShader
      */
     this.attributes = extractAttributes(this.gl, this);
 
     /**
      * a reference to the shader program (once compiled)
-     * @public
      * @type {WebGLProgram}
-     * @name program
-     * @memberof GLShader
      */
     this.program = compileProgram(
       this.gl,
@@ -7045,10 +7113,7 @@ class GLShader {
 
     /**
      * the uniforms of the shader
-     * @public
      * @type {object}
-     * @name uniforms
-     * @memberof GLShader
      */
     this.uniforms = extractUniforms(this.gl, this);
 
@@ -7058,8 +7123,6 @@ class GLShader {
 
   /**
    * Installs this shader program as part of current rendering state
-   * @name bind
-   * @memberof GLShader
    */
   bind() {
     this.gl.useProgram(this.program);
@@ -7067,8 +7130,6 @@ class GLShader {
 
   /**
    * returns the location of an attribute variable in this shader program
-   * @name getAttribLocation
-   * @memberof GLShader
    * @param {string} name the name of the attribute variable whose location to get.
    * @returns {GLint} number indicating the location of the variable name if found. Returns -1 otherwise
    */
@@ -7083,8 +7144,6 @@ class GLShader {
 
   /**
    * Set the uniform to the given value
-   * @name setUniform
-   * @memberof GLShader
    * @param {string} name the uniform name
    * @param {object|Float32Array} value the value to assign to that uniform
    * @example
@@ -7105,8 +7164,6 @@ class GLShader {
 
   /**
    * activate the given vertex attribute for this shader
-   * @name setVertexAttributes
-   * @memberof GLShader
    * @param {WebGLRenderingContext} gl the current WebGL rendering context
    * @param {object[]} attributes an array of vertex attributes
    * @param {number} vertexByteSize the size of a single vertex in bytes
@@ -7135,8 +7192,6 @@ class GLShader {
 
   /**
    * destroy this shader objects resources (program, attributes, uniforms)
-   * @name destroy
-   * @memberof GLShader
    */
   destroy() {
     this.uniforms = null;
@@ -7338,44 +7393,37 @@ class WebGLCompositor {
 
     /**
      * a reference to the active WebGL shader
-     * @name activeShader
-     * @memberof WebGLCompositor
      * @type {GLShader}
      */
     this.activeShader = null;
 
     /**
      * primitive type to render (gl.POINTS, gl.LINE_STRIP, gl.LINE_LOOP, gl.LINES, gl.TRIANGLE_STRIP, gl.TRIANGLE_FAN, gl.TRIANGLES)
-     * @name mode
-     * @see WebGLCompositor
-     * @memberof WebGLCompositor
+     * @type {number}
      * @default gl.TRIANGLES
      */
     this.mode = gl.TRIANGLES;
 
     /**
      * an array of vertex attribute properties
-     * @name attributes
      * @see WebGLCompositor.addAttribute
-     * @memberof WebGLCompositor
+     * @type {Array}
      */
     this.attributes = [];
 
     /**
      * the size of a single vertex in bytes
      * (will automatically be calculated as attributes definitions are added)
-     * @name vertexByteSize
      * @see WebGLCompositor.addAttribute
-     * @memberof WebGLCompositor
+     * @type {number}
      */
     this.vertexByteSize = 0;
 
     /**
      * the size of a single vertex in floats
      * (will automatically be calculated as attributes definitions are added)
-     * @name vertexSize
      * @see WebGLCompositor.addAttribute
-     * @memberof WebGLCompositor
+     * @type {number}
      */
     this.vertexSize = 0;
 
@@ -7437,8 +7485,8 @@ class WebGLCompositor {
     this.setViewport(
       0,
       0,
-      this.renderer.getScreenCanvas().width,
-      this.renderer.getScreenCanvas().height
+      this.renderer.getCanvas().width,
+      this.renderer.getCanvas().height
     );
 
     // Initialize clear color
@@ -7459,8 +7507,6 @@ class WebGLCompositor {
 
   /**
    * add vertex attribute property definition to the compositor
-   * @name addAttribute
-   * @memberof WebGLCompositor
    * @param {string} name name of the attribute in the vertex shader
    * @param {number} size number of components per vertex attribute. Must be 1, 2, 3, or 4.
    * @param {GLenum} type data type of each component in the array
@@ -7506,8 +7552,6 @@ class WebGLCompositor {
 
   /**
    * Sets the viewport
-   * @name setViewport
-   * @memberof WebGLCompositor
    * @param {number} x x position of viewport
    * @param {number} y y position of viewport
    * @param {number} w width of viewport
@@ -7519,8 +7563,6 @@ class WebGLCompositor {
 
   /**
    * Create a WebGL texture from an image
-   * @name createTexture2D
-   * @memberof WebGLCompositor
    * @param {number} unit Destination texture unit
    * @param {Image|HTMLCanvasElement|ImageData|Uint8Array[]|Float32Array[]} image Source image
    * @param {number} filter gl.LINEAR or gl.NEAREST
@@ -7598,8 +7640,6 @@ class WebGLCompositor {
 
   /**
    * delete the given WebGL texture
-   * @name bindTexture2D
-   * @memberof WebGLCompositor
    * @param {WebGLTexture} [texture] a WebGL texture to delete
    * @param {number} [unit] Texture unit to delete
    */
@@ -7610,8 +7650,6 @@ class WebGLCompositor {
 
   /**
    * returns the WebGL texture associated to the given texture unit
-   * @name bindTexture2D
-   * @memberof WebGLCompositor
    * @param {number} unit Texture unit to which a texture is bound
    * @returns {WebGLTexture} texture a WebGL texture
    */
@@ -7621,8 +7659,6 @@ class WebGLCompositor {
 
   /**
    * assign the given WebGL texture to the current batch
-   * @name bindTexture2D
-   * @memberof WebGLCompositor
    * @param {WebGLTexture} texture a WebGL texture
    * @param {number} unit Texture unit to which the given texture is bound
    */
@@ -7647,8 +7683,6 @@ class WebGLCompositor {
 
   /**
    * unbind the given WebGL texture, forcing it to be reuploaded
-   * @name unbindTexture2D
-   * @memberof WebGLCompositor
    * @param {WebGLTexture} [texture] a WebGL texture
    * @param {number} [unit] a WebGL texture
    * @returns {number} unit the unit number that was associated with the given texture
@@ -7693,8 +7727,6 @@ class WebGLCompositor {
 
   /**
    * set/change the current projection matrix
-   * @name setProjection
-   * @memberof WebGLCompositor
    * @param {Matrix3d} matrix
    */
   setProjection(matrix) {
@@ -7703,9 +7735,7 @@ class WebGLCompositor {
 
   /**
    * Select the shader to use for compositing
-   * @name useShader
    * @see GLShader
-   * @memberof WebGLCompositor
    * @param {GLShader} shader a reference to a GLShader instance
    */
   useShader(shader) {
@@ -7727,8 +7757,6 @@ class WebGLCompositor {
 
   /**
    * Add a textured quad
-   * @name addQuad
-   * @memberof WebGLCompositor
    * @param {TextureAtlas} texture Source texture atlas
    * @param {number} x Destination x-coordinate
    * @param {number} y Destination y-coordinate
@@ -7783,7 +7811,6 @@ class WebGLCompositor {
   /**
    * Flush batched texture operations to the GPU
    * @param {number} [mode=gl.TRIANGLES] the GL drawing mode
-   * @memberof WebGLCompositor
    */
   flush(mode = this.mode) {
     var vertex = this.vertexBuffer;
@@ -7819,8 +7846,6 @@ class WebGLCompositor {
 
   /**
    * Draw an array of vertices
-   * @name drawVertices
-   * @memberof WebGLCompositor
    * @param {GLenum} mode primitive type to render (gl.POINTS, gl.LINE_STRIP, gl.LINE_LOOP, gl.LINES, gl.TRIANGLE_STRIP, gl.TRIANGLE_FAN, gl.TRIANGLES)
    * @param {Vector2d[]} verts vertices
    * @param {number} [vertexCount=verts.length] amount of points defined in the points array
@@ -7847,25 +7872,26 @@ class WebGLCompositor {
   }
 
   /**
-   * Specify the color values used when clearing color buffers. The values are clamped between 0 and 1.
-   * @name clearColor
-   * @memberof WebGLCompositor
-   * @param {number} [r=0] - the red color value used when the color buffers are cleared
-   * @param {number} [g=0] - the green color value used when the color buffers are cleared
-   * @param {number} [b=0] - the blue color value used when the color buffers are cleared
-   * @param {number} [a=0] - the alpha color value used when the color buffers are cleared
+   * Clear the frame buffer
+   * @param {number} [alpha = 0.0] - the alpha value used when clearing the framebuffer
    */
-  clearColor(r, g, b, a) {
-    this.gl.clearColor(r, g, b, a);
+  clear(alpha = 0) {
+    var gl = this.gl;
+    gl.clearColor(0, 0, 0, alpha);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
   }
 
   /**
-   * Clear the frame buffer
-   * @name clear
-   * @memberof WebGLCompositor
+   * Specify the color values used when clearing color buffers. The values are clamped between 0 and 1.
+   * @param {number} [r = 0] - the red color value used when the color buffers are cleared
+   * @param {number} [g = 0] - the green color value used when the color buffers are cleared
+   * @param {number} [b = 0] - the blue color value used when the color buffers are cleared
+   * @param {number} [a = 0] - the alpha color value used when the color buffers are cleared
    */
-  clear() {
-    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+  clearColor(r = 0, g = 0, b = 0, a = 0) {
+    var gl = this.gl;
+    gl.clearColor(r, g, b, a);
+    gl.clear(gl.COLOR_BUFFER_BIT);
   }
 }
 
@@ -10297,17 +10323,18 @@ class Bounds {
    * add the given point to the bounds definition.
    * @name addPoint
    * @memberof Bounds
-   * @param {Vector2d} v
-   * @param {Matrix2d} [m] an optional transform to apply to the given point
+   * @param {Vector2d|Point} point the point to be added to the bounds
+   * @param {Matrix2d} [m] an optional transform to apply to the given point (only if the given point is a vector)
    */
-  addPoint(v, m) {
-    if (typeof m !== "undefined") {
-      v = m.apply(v);
+  addPoint(point, m) {
+    if (typeof m !== "undefined" && typeof point.rotate === "function") {
+      // only Vectors object have a rotate function
+      point = m.apply(point);
     }
-    this.min.x = Math.min(this.min.x, v.x);
-    this.max.x = Math.max(this.max.x, v.x);
-    this.min.y = Math.min(this.min.y, v.y);
-    this.max.y = Math.max(this.max.y, v.y);
+    this.min.x = Math.min(this.min.x, point.x);
+    this.max.x = Math.max(this.max.x, point.x);
+    this.min.y = Math.min(this.min.y, point.y);
+    this.max.y = Math.max(this.max.y, point.y);
   }
 
   /**
@@ -10846,6 +10873,86 @@ class Path2D {
 
 /**
  * @classdesc
+ * represents a point in a 2d space
+ */
+class Point {
+  constructor(x = 0, y = 0) {
+    /**
+     * the position of the point on the horizontal axis
+     * @public
+     * @type {Number}
+     * @default 0
+     */
+    this.x = x;
+
+    /**
+     * the position of the point on the vertical axis
+     * @public
+     * @type {Number}
+     * @default 0
+     */
+    this.y = y;
+  }
+
+  /** @ignore */
+  onResetEvent(x = 0, y = 0) {
+    this.set(x, y);
+  }
+
+  /**
+   * set the Point x and y properties to the given values
+   * @param {number} x
+   * @param {number} y
+   * @returns {Point} Reference to this object for method chaining
+   */
+  set(x = 0, y = 0) {
+    this.x = x;
+    this.y = y;
+    return this;
+  }
+
+  /**
+   * return true if the two points are the same
+   * @name equals
+   * @memberof Point
+   * @method
+   * @param {Point} point
+   * @returns {boolean}
+   */
+  /**
+   * return true if this point is equal to the given values
+   * @name equals
+   * @memberof Point
+   * @param {number} x
+   * @param {number} y
+   * @returns {boolean}
+   */
+  equals() {
+    var _x, _y;
+    if (arguments.length === 2) {
+      // x, y
+      _x = arguments[0];
+      _y = arguments[1];
+    } else {
+      // point
+      _x = arguments[0].x;
+      _y = arguments[0].y;
+    }
+    return this.x === _x && this.y === _y;
+  }
+
+  /**
+   * clone this Point
+   * @name clone
+   * @returns {Point} new Point
+   */
+  clone() {
+    return new Point(this.x, this.y);
+  }
+}
+
+/**
+ * @classdesc
  * a base renderer object
  */
 class Renderer {
@@ -10854,10 +10961,10 @@ class Renderer {
    * @param {number} options.width The width of the canvas without scaling
    * @param {number} options.height The height of the canvas without scaling
    * @param {HTMLCanvasElement} [options.canvas] The html canvas to draw to on screen
-   * @param {boolean} [options.doubleBuffering=false] Whether to enable double buffering (not applicable when using the WebGL Renderer)
    * @param {boolean} [options.antiAlias=false] Whether to enable anti-aliasing, use false (default) for a pixelated effect.
    * @param {boolean} [options.failIfMajorPerformanceCaveat=true] If true, the renderer will switch to CANVAS mode if the performances of a WebGL context would be dramatically lower than that of a native application making equivalent OpenGL calls.
-   * @param {boolean} [options.transparent=false] Whether to enable transparency on the canvas (performance hit when enabled)
+   * @param {boolean} [options.transparent=false] Whether to enable transparency on the canvas
+   * @param {boolean} [options.premultipliedAlpha=true] in WebGL, whether the renderer will assume that colors have premultiplied alpha when canvas transparency is enabled
    * @param {boolean} [options.blendMode="normal"] the default blend mode to use ("normal", "multiply")
    * @param {boolean} [options.subPixel=false] Whether to enable subpixel rendering (performance hit when enabled)
    * @param {boolean} [options.verbose=false] Enable the verbose mode that provides additional details as to what the renderer is doing
@@ -10868,26 +10975,20 @@ class Renderer {
     /**
      * The given constructor options
      * @public
-     * @name settings
-     * @memberof Renderer#
      * @type {object}
      */
     this.settings = options;
 
     /**
      * true if the current rendering context is valid
-     * @name isContextValid
-     * @memberof Renderer#
      * @default true
-     * type {boolean}
+     * @type {boolean}
      */
     this.isContextValid = true;
 
     /**
      * The Path2D instance used by the renderer to draw primitives
-     * @name path2D
      * @type {Path2D}
-     * @memberof Renderer#
      */
     this.path2D = new Path2D();
 
@@ -10921,12 +11022,8 @@ class Renderer {
     } else if (typeof this.settings.canvas !== "undefined") {
       this.canvas = this.settings.canvas;
     } else {
-      this.canvas = createCanvas(this.settings.zoomX, this.settings.zoomY);
+      this.canvas = createCanvas(this.settings.width, this.settings.height);
     }
-
-    // canvas object and context
-    this.backBufferCanvas = this.canvas;
-    this.context = null;
 
     // global color
     this.currentColor = new Color(0, 0, 0, 1.0);
@@ -10948,15 +11045,16 @@ class Renderer {
 
   /**
    * prepare the framebuffer for drawing a new frame
-   * @name clear
-   * @memberof Renderer
    */
   clear() {}
 
   /**
+   * render the main framebuffer on screen
+   */
+  flush() {}
+
+  /**
    * Reset context state
-   * @name reset
-   * @memberof Renderer
    */
   reset() {
     this.resetTransform();
@@ -10966,46 +11064,29 @@ class Renderer {
     this.cache.clear();
     this.currentScissor[0] = 0;
     this.currentScissor[1] = 0;
-    this.currentScissor[2] = this.backBufferCanvas.width;
-    this.currentScissor[3] = this.backBufferCanvas.height;
+    this.currentScissor[2] = this.getCanvas().width;
+    this.currentScissor[3] = this.getCanvas().height;
     this.clearMask();
   }
 
   /**
-   * return a reference to the system canvas
-   * @name getCanvas
-   * @memberof Renderer
+   * return a reference to the canvas which this renderer draws to
    * @returns {HTMLCanvasElement}
    */
   getCanvas() {
-    return this.backBufferCanvas;
-  }
-
-  /**
-   * return a reference to the screen canvas
-   * @name getScreenCanvas
-   * @memberof Renderer
-   * @returns {HTMLCanvasElement}
-   */
-  getScreenCanvas() {
     return this.canvas;
   }
 
   /**
-   * return a reference to the screen canvas corresponding 2d Context<br>
-   * (will return buffered context if double buffering is enabled, or a reference to the Screen Context)
-   * @name getScreenContext
-   * @memberof Renderer
-   * @returns {CanvasRenderingContext2D}
+   * return a reference to this renderer canvas corresponding Context
+   * @returns {CanvasRenderingContext2D|WebGLRenderingContext}
    */
-  getScreenContext() {
+  getContext() {
     return this.context;
   }
 
   /**
    * returns the current blend mode for this renderer
-   * @name getBlendMode
-   * @memberof Renderer
    * @returns {string} blend mode
    */
   getBlendMode() {
@@ -11015,8 +11096,6 @@ class Renderer {
   /**
    * Returns the 2D Context object of the given Canvas<br>
    * Also configures anti-aliasing and blend modes based on constructor options.
-   * @name getContext2d
-   * @memberof Renderer
    * @param {HTMLCanvasElement} canvas
    * @param {boolean} [transparent=true] use false to disable transparency
    * @returns {CanvasRenderingContext2D}
@@ -11049,28 +11128,22 @@ class Renderer {
 
   /**
    * return the width of the system Canvas
-   * @name getWidth
-   * @memberof Renderer
    * @returns {number}
    */
   getWidth() {
-    return this.backBufferCanvas.width;
+    return this.getCanvas().width;
   }
 
   /**
    * return the height of the system Canvas
-   * @name getHeight
-   * @memberof Renderer
    * @returns {number} height of the system Canvas
    */
   getHeight() {
-    return this.backBufferCanvas.height;
+    return this.getCanvas().height;
   }
 
   /**
    * get the current fill & stroke style color.
-   * @name getColor
-   * @memberof Renderer
    * @returns {Color} current global color
    */
   getColor() {
@@ -11079,8 +11152,6 @@ class Renderer {
 
   /**
    * return the current global alpha
-   * @name globalAlpha
-   * @memberof Renderer
    * @returns {number}
    */
   globalAlpha() {
@@ -11089,8 +11160,6 @@ class Renderer {
 
   /**
    * check if the given rect or bounds overlaps with the renderer screen coordinates
-   * @name overlaps
-   * @memberof Renderer
    * @param {Rect|Bounds} bounds
    * @returns {boolean} true if overlaps
    */
@@ -11105,18 +11174,14 @@ class Renderer {
 
   /**
    * resizes the system canvas
-   * @name resize
-   * @memberof Renderer
    * @param {number} width new width of the canvas
    * @param {number} height new height of the canvas
    */
   resize(width, height) {
-    if (
-      width !== this.backBufferCanvas.width ||
-      height !== this.backBufferCanvas.height
-    ) {
-      this.canvas.width = this.backBufferCanvas.width = width;
-      this.canvas.height = this.backBufferCanvas.height = height;
+    var canvas = this.getCanvas();
+    if (width !== canvas.width || height !== canvas.height) {
+      canvas.width = width;
+      canvas.height = height;
       this.currentScissor[0] = 0;
       this.currentScissor[1] = 0;
       this.currentScissor[2] = width;
@@ -11128,8 +11193,6 @@ class Renderer {
 
   /**
    * enable/disable image smoothing (scaling interpolation) for the given context
-   * @name setAntiAlias
-   * @memberof Renderer
    * @param {CanvasRenderingContext2D} context
    * @param {boolean} [enable=false]
    */
@@ -11157,8 +11220,6 @@ class Renderer {
 
   /**
    * set/change the current projection matrix (WebGL only)
-   * @name setProjection
-   * @memberof Renderer
    * @param {Matrix3d} matrix
    */
   setProjection(matrix) {
@@ -11167,8 +11228,6 @@ class Renderer {
 
   /**
    * stroke the given shape
-   * @name stroke
-   * @memberof Renderer
    * @param {Rect|RoundRect|Polygon|Line|Ellipse} shape a shape object to stroke
    * @param {boolean} [fill=false] fill the shape with the current color if true
    */
@@ -11202,6 +11261,10 @@ class Renderer {
       );
       return;
     }
+    if (shape instanceof Point) {
+      this.strokePoint(shape.x, shape.y);
+      return;
+    }
     throw new Error("Invalid geometry for fill/stroke");
   }
 
@@ -11217,8 +11280,6 @@ class Renderer {
 
   /**
    * tint the given image or canvas using the given color
-   * @name tint
-   * @memberof Renderer
    * @param {HTMLImageElement|HTMLCanvasElement|OffscreenCanvas} src the source image to be tinted
    * @param {Color|string} color the color that will be used to tint the image
    * @param {string} [mode="multiply"] the composition mode used to tint the image
@@ -11247,8 +11308,6 @@ class Renderer {
    * A mask limits rendering elements to the shape and position of the given mask object.
    * So, if the renderable is larger than the mask, only the intersecting part of the renderable will be visible.
    * Mask are not preserved through renderer context save and restore.
-   * @name setMask
-   * @memberof Renderer
    * @param {Rect|RoundRect|Polygon|Line|Ellipse} [mask] the shape defining the mask to be applied
    * @param {boolean} [invert=false] either the given shape should define what is visible (default) or the opposite
    */
@@ -11257,16 +11316,12 @@ class Renderer {
 
   /**
    * disable (remove) the rendering mask set through setMask.
-   * @name clearMask
    * @see Renderer#setMask
-   * @memberof Renderer
    */
   clearMask() {}
 
   /**
    * set a coloring tint for sprite based renderables
-   * @name setTint
-   * @memberof Renderer
    * @param {Color} tint the tint color
    * @param {number} [alpha] an alpha value to be applied to the tint
    */
@@ -11278,9 +11333,7 @@ class Renderer {
 
   /**
    * clear the rendering tint set through setTint.
-   * @name clearTint
    * @see Renderer#setTint
-   * @memberof Renderer
    */
   clearTint() {
     // reset to default
@@ -15880,8 +15933,32 @@ class ObservableVector2d extends Vector2d {
    * @returns {ObservableVector2d} Reference to this object for method chaining
    */
   lerp(v, alpha) {
-    this._x += (v.x - this._x) * alpha;
-    this._y += (v.y - this._y) * alpha;
+    return this._set(
+      this._x + (v.x - this._x) * alpha,
+      this._y + (v.y - this._y) * alpha
+    );
+  }
+
+  /**
+   * interpolate the position of this vector towards the given one while nsure that the distance never exceeds the given step.
+   * @name moveTowards
+   * @memberof ObservableVector2d
+   * @param {Vector2d|ObservableVector2d} target
+   * @param {number} step the maximum step per iteration (Negative values will push the vector away from the target)
+   * @returns {ObservableVector2d} Reference to this object for method chaining
+   */
+  moveTowards(target, step) {
+    var angle = Math.atan2(target.y - this._y, target.x - this._x);
+
+    var distance = this.distance(target);
+
+    if (distance === 0 || (step >= 0 && distance <= step * step)) {
+      return target;
+    }
+
+    this._x += Math.cos(angle) * step;
+    this._y += Math.sin(angle) * step;
+
     return this;
   }
 
@@ -16426,6 +16503,32 @@ class Vector3d {
     this.x += (v.x - this.x) * alpha;
     this.y += (v.y - this.y) * alpha;
     this.z += (v.z - this.z) * alpha;
+    return this;
+  }
+
+  /**
+   * interpolate the position of this vector on the x and y axis towards the given one by the given maximum step.
+   * @name moveTowards
+   * @memberof Vector3d
+   * @param {Vector2d|Vector3d} target
+   * @param {number} step the maximum step per iteration (Negative values will push the vector away from the target)
+   * @returns {Vector3d} Reference to this object for method chaining
+   */
+  moveTowards(target, step) {
+    var angle = Math.atan2(target.y - this.y, target.x - this.x);
+
+    var dx = this.x - target.x;
+    var dy = this.y - target.y;
+
+    var distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance === 0 || (step >= 0 && distance <= step * step)) {
+      return target;
+    }
+
+    this.x += Math.cos(angle) * step;
+    this.y += Math.sin(angle) * step;
+
     return this;
   }
 
@@ -16995,10 +17098,38 @@ class ObservableVector3d extends Vector3d {
    * @returns {ObservableVector3d} Reference to this object for method chaining
    */
   lerp(v, alpha) {
-    this._x += (v.x - this._x) * alpha;
-    this._y += (v.y - this._y) * alpha;
-    this._z += (v.z - this._z) * alpha;
-    return this;
+    return this._set(
+      this._x + (v.x - this._x) * alpha,
+      this._y + (v.y - this._y) * alpha,
+      this._z + (v.z - this._z) * alpha
+    );
+  }
+
+  /**
+   * interpolate the position of this vector on the x and y axis towards the given one while ensure that the distance never exceeds the given step.
+   * @name moveTowards
+   * @memberof ObservableVector3d
+   * @param {Vector2d|ObservableVector2d|Vector3d|ObservableVector3d} target
+   * @param {number} step the maximum step per iteration (Negative values will push the vector away from the target)
+   * @returns {ObservableVector3d} Reference to this object for method chaining
+   */
+  moveTowards(target, step) {
+    var angle = Math.atan2(target.y - this._y, target.x - this._x);
+
+    var dx = this._x - target.x;
+    var dy = this._y - target.y;
+
+    var distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance === 0 || (step >= 0 && distance <= step * step)) {
+      return target;
+    }
+
+    return this._set(
+      this._x + Math.cos(angle) * step,
+      this._y + Math.sin(angle) * step,
+      this._z
+    );
   }
 
   /**
@@ -17995,7 +18126,7 @@ function enablePointerEvent() {
 
     if (pointerEventTarget === null) {
       // default pointer event target
-      pointerEventTarget = renderer.getScreenCanvas();
+      pointerEventTarget = renderer.getCanvas();
     }
 
     if (pointerEvent) {
@@ -18455,7 +18586,7 @@ var throttlingInterval;
  */
 function globalToLocal(x, y, v) {
   v = v || pool.pull("Vector2d");
-  var rect = getElementBounds(renderer.getScreenCanvas());
+  var rect = getElementBounds(renderer.getCanvas());
   var pixelRatio = globalThis.devicePixelRatio || 1;
   x -= rect.left + (globalThis.pageXOffset || 0);
   y -= rect.top + (globalThis.pageYOffset || 0);
@@ -19301,21 +19432,14 @@ class Renderable extends Rect {
 
     /**
      * If true then physic collision and input events will not impact this renderable
-     * @public
      * @type {boolean}
      * @default true
-     * @name isKinematic
-     * @memberof Renderable
      */
     this.isKinematic = true;
 
     /**
      * the renderable physic body
-     * @public
      * @type {Body}
-     * @see Body
-     * @name body
-     * @memberof Renderable#
      * @example
      *  // define a new Player Class
      *  class PlayerEntity extends me.Sprite {
@@ -19353,10 +19477,7 @@ class Renderable extends Rect {
     if (typeof this.currentTransform === "undefined") {
       /**
        * the renderable default transformation matrix
-       * @public
        * @type {Matrix2d}
-       * @name currentTransform
-       * @memberof Renderable#
        */
       this.currentTransform = pool.pull("Matrix2d");
     }
@@ -19366,20 +19487,14 @@ class Renderable extends Rect {
      * (G)ame (U)nique (Id)entifier" <br>
      * a GUID will be allocated for any renderable object added <br>
      * to an object container (including the `me.game.world` container)
-     * @public
      * @type {string}
-     * @name GUID
-     * @memberof Renderable
      */
     this.GUID = undefined;
 
     /**
      * an event handler that is called when the renderable leave or enter a camera viewport
-     * @public
      * @type {Function}
      * @default undefined
-     * @name onVisibilityChange
-     * @memberof Renderable#
      * @example
      * this.onVisibilityChange = function(inViewport) {
      *     if (inViewport === true) {
@@ -19391,42 +19506,30 @@ class Renderable extends Rect {
 
     /**
      * Whether the renderable object will always update, even when outside of the viewport<br>
-     * @public
      * @type {boolean}
      * @default false
-     * @name alwaysUpdate
-     * @memberof Renderable
      */
     this.alwaysUpdate = false;
 
     /**
      * Whether to update this object when the game is paused.
-     * @public
      * @type {boolean}
      * @default false
-     * @name updateWhenPaused
-     * @memberof Renderable
      */
     this.updateWhenPaused = false;
 
     /**
      * make the renderable object persistent over level changes<br>
-     * @public
      * @type {boolean}
      * @default false
-     * @name isPersistent
-     * @memberof Renderable
      */
     this.isPersistent = false;
 
     /**
      * If true, this renderable will be rendered using screen coordinates,
      * as opposed to world coordinates. Use this, for example, to define UI elements.
-     * @public
      * @type {boolean}
      * @default false
-     * @name floating
-     * @memberof Renderable
      */
     this.floating = false;
 
@@ -19443,11 +19546,8 @@ class Renderable extends Rect {
        * <br>
        * <i><b>Note:</b> Object created through Tiled will have their anchorPoint set to (0, 0) to match Tiled Level editor implementation.
        * To specify a value through Tiled, use a json expression like `json:{"x":0.5,"y":0.5}`. </i>
-       * @public
        * @type {ObservableVector2d}
        * @default <0.5,0.5>
-       * @name anchorPoint
-       * @memberof Renderable#
        */
       this.anchorPoint = pool.pull("ObservableVector2d", 0.5, 0.5, {
         onUpdate: this.onAnchorUpdate,
@@ -19458,11 +19558,8 @@ class Renderable extends Rect {
     /**
      * When enabled, an object container will automatically apply
      * any defined transformation before calling the child draw method.
-     * @public
      * @type {boolean}
      * @default true
-     * @name autoTransform
-     * @memberof Renderable
      * @example
      * // enable "automatic" transformation when the object is activated
      * onActivateEvent: function () {
@@ -19482,30 +19579,23 @@ class Renderable extends Rect {
      * Set to zero if you do not wish an object to be drawn
      * @see Renderable#setOpacity
      * @see Renderable#getOpacity
-     * @public
      * @type {number}
      * @default 1.0
-     * @name Renderable#alpha
      */
     this.alpha = 1.0;
 
     /**
      * a reference to the parent object that contains this renderable
-     * @public
      * @type {Container|Entity}
      * @default undefined
-     * @name Renderable#ancestor
      */
     this.ancestor = undefined;
 
     /**
      * A mask limits rendering elements to the shape and position of the given mask object.
      * So, if the renderable is larger than the mask, only the intersecting part of the renderable will be visible.
-     * @public
      * @type {Rect|RoundRect|Polygon|Line|Ellipse}
-     * @name mask
      * @default undefined
-     * @memberof Renderable#
      * @example
      * // apply a mask in the shape of a Star
      * myNPCSprite.mask = new me.Polygon(myNPCSprite.width / 2, 0, [
@@ -19525,39 +19615,18 @@ class Renderable extends Rect {
     this.mask = undefined;
 
     /**
-     * define a tint for this renderable. a (255, 255, 255) r, g, b value will remove the tint effect.
-     * @public
-     * @type {Color}
-     * @name tint
-     * @default (255, 255, 255)
-     * @memberof Renderable#
-     * @example
-     * // add a red tint to this renderable
-     * this.tint.setColor(255, 128, 128);
-     * // remove the tint
-     * this.tint.setColor(255, 255, 255);
-     */
-    this.tint = pool.pull("Color", 255, 255, 255, 1.0);
-
-    /**
      * the blend mode to be applied to this renderable (see renderer setBlendMode for available blend mode)
-     * @public
      * @type {string}
-     * @name blendMode
      * @default "normal"
      * @see CanvasRenderer#setBlendMode
      * @see WebGLRenderer#setBlendMode
-     * @memberof Renderable#
      */
     this.blendMode = "normal";
 
     /**
      * The name of the renderable
-     * @public
      * @type {string}
-     * @name name
      * @default ""
-     * @memberof Renderable
      */
     this.name = "";
 
@@ -19568,8 +19637,6 @@ class Renderable extends Rect {
        * Position of the Renderable relative to its parent container
        * @public
        * @type {ObservableVector3d}
-       * @name pos
-       * @memberof Renderable#
        */
       this.pos = pool.pull("ObservableVector3d", x, y, 0, {
         onUpdate: this.updateBoundsPos,
@@ -19580,9 +19647,7 @@ class Renderable extends Rect {
     /**
      * when true the renderable will be redrawn during the next update cycle
      * @type {boolean}
-     * @name isDirty
      * @default false
-     * @memberof Renderable#
      */
     this.isDirty = false;
 
@@ -19601,11 +19666,8 @@ class Renderable extends Rect {
 
   /**
    * Whether the renderable object is floating, or contained in a floating container
-   * @public
    * @see Renderable#floating
    * @type {boolean}
-   * @name isFloating
-   * @memberof Renderable
    */
   get isFloating() {
     return (
@@ -19615,12 +19677,37 @@ class Renderable extends Rect {
   }
 
   /**
+   * define a tint for this renderable. a (255, 255, 255) r, g, b value will remove the tint effect.
+   * @type {Color}
+   * @default (255, 255, 255)
+   * @example
+   * // add a red tint to this renderable
+   * this.tint.setColor(255, 128, 128);
+   * // remove the tint
+   * this.tint.setColor(255, 255, 255);
+   */
+  get tint() {
+    if (typeof this._tint === "undefined") {
+      this._tint = pool.pull("Color", 255, 255, 255, 1.0);
+    }
+    return this._tint;
+  }
+  set tint(value) {
+    if (typeof this._tint === "undefined") {
+      this._tint = pool.pull("Color", 255, 255, 255, 1.0);
+    }
+    if (value instanceof Color) {
+      this._tint.copy(value);
+    } else {
+      // string (#RGB, #ARGB, #RRGGBB, #AARRGGBB)
+      this._tint.parseCSS(value);
+    }
+  }
+
+  /**
    * Whether the renderable object is visible and within the viewport
-   * @public
    * @type {boolean}
    * @default false
-   * @name inViewport
-   * @memberof Renderable
    */
   get inViewport() {
     return this._inViewport;
@@ -19639,8 +19726,6 @@ class Renderable extends Rect {
    * @public
    * @see Renderable#flipX
    * @type {boolean}
-   * @name isFlippedX
-   * @memberof Renderable
    */
   get isFlippedX() {
     return this._flip.x === true;
@@ -19651,8 +19736,6 @@ class Renderable extends Rect {
    * @public
    * @see Renderable#flipY
    * @type {boolean}
-   * @name isFlippedY
-   * @memberof Renderable
    */
   get isFlippedY() {
     return this._flip.y === true;
@@ -19660,8 +19743,6 @@ class Renderable extends Rect {
 
   /**
    * returns the bounding box for this renderable
-   * @name getBounds
-   * @memberof Renderable
    * @returns {Bounds} bounding box Rectangle object
    */
   getBounds() {
@@ -19684,8 +19765,6 @@ class Renderable extends Rect {
 
   /**
    * get the renderable alpha channel value<br>
-   * @name getOpacity
-   * @memberof Renderable
    * @returns {number} current opacity value between 0 and 1
    */
   getOpacity() {
@@ -19694,8 +19773,6 @@ class Renderable extends Rect {
 
   /**
    * set the renderable alpha channel value<br>
-   * @name setOpacity
-   * @memberof Renderable
    * @param {number} alpha opacity value between 0.0 and 1.0
    */
   setOpacity(alpha) {
@@ -19712,8 +19789,6 @@ class Renderable extends Rect {
   /**
    * flip the renderable on the horizontal axis (around the center of the renderable)
    * @see Matrix2d#scaleX
-   * @name flipX
-   * @memberof Renderable
    * @param {boolean} [flip=true] `true` to flip this renderable.
    * @returns {Renderable} Reference to this object for method chaining
    */
@@ -19726,8 +19801,6 @@ class Renderable extends Rect {
   /**
    * flip the renderable on the vertical axis (around the center of the renderable)
    * @see Matrix2d#scaleY
-   * @name flipY
-   * @memberof Renderable
    * @param {boolean} [flip=true] `true` to flip this renderable.
    * @returns {Renderable} Reference to this object for method chaining
    */
@@ -19739,8 +19812,6 @@ class Renderable extends Rect {
 
   /**
    * multiply the renderable currentTransform with the given matrix
-   * @name transform
-   * @memberof Renderable
    * @see Renderable#currentTransform
    * @param {Matrix2d} m the transformation matrix
    * @returns {Renderable} Reference to this object for method chaining
@@ -19755,8 +19826,6 @@ class Renderable extends Rect {
 
   /**
    * return the angle to the specified target
-   * @name angleTo
-   * @memberof Renderable
    * @param {Renderable|Vector2d|Vector3d} target
    * @returns {number} angle in radians
    */
@@ -19779,8 +19848,6 @@ class Renderable extends Rect {
 
   /**
    * return the distance to the specified target
-   * @name distanceTo
-   * @memberof Renderable
    * @param {Renderable|Vector2d|Vector3d} target
    * @returns {number} distance
    */
@@ -19803,8 +19870,6 @@ class Renderable extends Rect {
 
   /**
    * Rotate this renderable towards the given target.
-   * @name lookAt
-   * @memberof Renderable
    * @param {Renderable|Vector2d|Vector3d} target the renderable or position to look at
    * @returns {Renderable} Reference to this object for method chaining
    */
@@ -19826,8 +19891,6 @@ class Renderable extends Rect {
 
   /**
    * Rotate this renderable by the specified angle (in radians).
-   * @name rotate
-   * @memberof Renderable
    * @param {number} angle The angle to rotate (in radians)
    * @param {Vector2d|ObservableVector2d} [v] an optional point to rotate around
    * @returns {Renderable} Reference to this object for method chaining
@@ -19847,8 +19910,6 @@ class Renderable extends Rect {
    * when rendering.  It does not scale the object itself.  For example if the renderable
    * is an image, the image.width and image.height properties are unaltered but the currentTransform
    * member will be changed.
-   * @name scale
-   * @memberof Renderable
    * @param {number} x a number representing the abscissa of the scaling vector.
    * @param {number} [y=x] a number representing the ordinate of the scaling vector.
    * @returns {Renderable} Reference to this object for method chaining
@@ -19862,8 +19923,6 @@ class Renderable extends Rect {
 
   /**
    * scale the renderable around his anchor point
-   * @name scaleV
-   * @memberof Renderable
    * @param {Vector2d} v scaling vector
    * @returns {Renderable} Reference to this object for method chaining
    */
@@ -19873,11 +19932,7 @@ class Renderable extends Rect {
   }
 
   /**
-   * update function. <br>
-   * automatically called by the game manager {@link game}
-   * @name update
-   * @memberof Renderable
-   * @protected
+   * update function (automatically called by melonJS).
    * @param {number} dt time since the last update in milliseconds.
    * @returns {boolean} true if the renderable is dirty
    */
@@ -19889,8 +19944,6 @@ class Renderable extends Rect {
   /**
    * update the bounding box for this shape.
    * @ignore
-   * @name updateBounds
-   * @memberof Renderable
    * @returns {Bounds} this shape bounding box Rectangle object
    */
   updateBounds() {
@@ -19902,8 +19955,6 @@ class Renderable extends Rect {
   /**
    * update the renderable's bounding rect (private)
    * @ignore
-   * @name updateBoundsPos
-   * @memberof Renderable
    */
   updateBoundsPos(newX, newY) {
     var bounds = this.getBounds();
@@ -19934,8 +19985,6 @@ class Renderable extends Rect {
 
   /**
    * return the renderable absolute position in the game world
-   * @name getAbsolutePosition
-   * @memberof Renderable
    * @returns {Vector2d}
    */
   getAbsolutePosition() {
@@ -19953,8 +20002,6 @@ class Renderable extends Rect {
   /**
    * called when the anchor point value is changed
    * @private
-   * @name onAnchorUpdate
-   * @memberof Renderable
    * @param {number} x the new X value to be set for the anchor
    * @param {number} y the new Y value to be set for the anchor
    */
@@ -19967,12 +20014,10 @@ class Renderable extends Rect {
   }
 
   /**
-   * prepare the rendering context before drawing
-   * (apply defined transforms, anchor point). <br>
-   * automatically called by the game manager {@link game}
-   * @name preDraw
-   * @memberof Renderable
-   * @protected
+   * Prepare the rendering context before drawing (automatically called by melonJS).
+   * This will apply any defined transforms, anchor point, tint or blend mode and translate the context accordingly to this renderable position.
+   * @see Renderable#draw
+   * @see Renderable#postDraw
    * @param {CanvasRenderer|WebGLRenderer} renderer a renderer object
    */
   preDraw(renderer) {
@@ -20023,10 +20068,15 @@ class Renderable extends Rect {
   }
 
   /**
-   * draw this renderable (automatically called by melonJS)
-   * @name draw
-   * @memberof Renderable
-   * @protected
+   * Draw this renderable (automatically called by melonJS).
+   * All draw operations for renderable are made respectively
+   * to the position or transforms set or applied by the preDraw method.
+   * The main draw loop will first call preDraw() to prepare the context for drawing the renderable,
+   * then draw() to draw the renderable, and finally postDraw() to clear the context.
+   * If you override this method, be mindful about the drawing logic; for example if you draw a shape
+   * from the draw method, you should make sure that your draw it at the 0, 0 coordinates.
+   * @see Renderable#preDraw
+   * @see Renderable#postDraw
    * @param {CanvasRenderer|WebGLRenderer} renderer a renderer instance
    * @param {Camera2d} [viewport] the viewport to (re)draw
    */
@@ -20036,11 +20086,9 @@ class Renderable extends Rect {
   }
 
   /**
-   * restore the rendering context after drawing. <br>
-   * automatically called by the game manager {@link game}
-   * @name postDraw
-   * @memberof Renderable
-   * @protected
+   * restore the rendering context after drawing (automatically called by melonJS).
+   * @see Renderable#preDraw
+   * @see Renderable#draw
    * @param {CanvasRenderer|WebGLRenderer} renderer a renderer object
    */
   postDraw(renderer) {
@@ -20062,8 +20110,6 @@ class Renderable extends Rect {
   /**
    * onCollision callback, triggered in case of collision,
    * when this renderable body is colliding with another one
-   * @name onCollision
-   * @memberof Renderable
    * @param {ResponseObject} response the collision response object
    * @param {Renderable} other the other renderable touching this one (a reference to response.a or response.b)
    * @returns {boolean} true if the object should respond to the collision (its position and velocity will be corrected)
@@ -20116,9 +20162,9 @@ class Renderable extends Rect {
       this.mask = undefined;
     }
 
-    if (typeof this.tint !== "undefined") {
-      pool.push(this.tint);
-      this.tint = undefined;
+    if (typeof this._tint !== "undefined") {
+      pool.push(this._tint);
+      this._tint = undefined;
     }
 
     this.ancestor = undefined;
@@ -20139,8 +20185,6 @@ class Renderable extends Rect {
   /**
    * OnDestroy Notification function<br>
    * Called by engine before deleting the object
-   * @name onDestroyEvent
-   * @memberof Renderable
    */
   onDestroyEvent() {
     // to be extended !
@@ -21018,7 +21062,7 @@ var collision = {
 class Body {
   /**
    * @param {Renderable} ancestor the parent object this body is attached to
-   * @param {Rect|Rect[]|Polygon|Polygon[]|Line|Line[]|Ellipse|Ellipse[]|Bounds|Bounds[]|object} [shapes] a initial shape, list of shapes, or JSON object defining the body
+   * @param {Rect|Rect[]|Polygon|Polygon[]|Line|Line[]|Ellipse|Ellipse[]|Point|Point[]|Bounds|Bounds[]|object} [shapes] a initial shape, list of shapes, or JSON object defining the body
    * @param {Function} [onBodyUpdate] callback for when the body is updated (e.g. add/remove shapes)
    */
   constructor(ancestor, shapes, onBodyUpdate) {
@@ -21044,7 +21088,7 @@ class Body {
       /**
        * The collision shapes of the body
        * @ignore
-       * @type {Polygon[]|Line[]|Ellipse[]}
+       * @type {Polygon[]|Line[]|Ellipse[]|Point|Point[]}
        */
       this.shapes = [];
     }
@@ -21233,7 +21277,7 @@ class Body {
   /**
    * add a collision shape to this body <br>
    * (note: me.Rect objects will be converted to me.Polygon before being added)
-   * @param {Rect|Polygon|Line|Ellipse|Bounds|object} shape a shape or JSON object
+   * @param {Rect|Polygon|Line|Ellipse|Point|Point[]|Bounds|object} shape a shape or JSON object
    * @returns {number} the shape array length
    * @example
    * // add a rectangle shape
@@ -21265,6 +21309,12 @@ class Body {
       // update the body bounds
       this.bounds.add(shape.points);
       this.bounds.translate(shape.pos);
+    } else if (shape instanceof Point) {
+      if (!this.shapes.includes(shape)) {
+        // see removeShape
+        this.shapes.push(shape);
+      }
+      this.bounds.addPoint(shape);
     } else {
       // JSON object
       this.fromJSON(shape);
@@ -25264,8 +25314,7 @@ function parseAttributes(obj, elt) {
  * @param  {number[]} data Array of bytes
  * @param  {string} format compressed data format ("gzip","zlib")
  */
-function decompress(data, format) {
-  console.log(data, format);
+function decompress() {
   throw new Error("GZIP/ZLIB compressed TMX Tile Map not supported!");
 }
 /**
@@ -25714,7 +25763,6 @@ class CanvasRenderer extends Renderer {
    * @param {number} options.width The width of the canvas without scaling
    * @param {number} options.height The height of the canvas without scaling
    * @param {HTMLCanvasElement} [options.canvas] The html canvas to draw to on screen
-   * @param {boolean} [options.doubleBuffering=false] Whether to enable double buffering
    * @param {boolean} [options.antiAlias=false] Whether to enable anti-aliasing
    * @param {boolean} [options.transparent=false] Whether to enable transparency on the canvas (performance hit when enabled)
    * @param {boolean} [options.subPixel=false] Whether to enable subpixel renderering (performance hit when enabled)
@@ -25728,22 +25776,9 @@ class CanvasRenderer extends Renderer {
 
     // defined the 2d context
     this.context = this.getContext2d(
-      this.getScreenCanvas(),
+      this.getCanvas(),
       this.settings.transparent
     );
-
-    // create the back buffer if we use double buffering
-    if (this.settings.doubleBuffering) {
-      this.backBufferCanvas = createCanvas(
-        this.settings.width,
-        this.settings.height,
-        true
-      );
-      this.backBufferContext2D = this.getContext2d(this.backBufferCanvas);
-    } else {
-      this.backBufferCanvas = this.getScreenCanvas();
-      this.backBufferContext2D = this.context;
-    }
 
     this.setBlendMode(this.settings.blendMode);
 
@@ -25759,7 +25794,7 @@ class CanvasRenderer extends Renderer {
     }
 
     // context lost & restore event for canvas
-    this.getScreenCanvas().addEventListener(
+    this.getCanvas().addEventListener(
       "contextlost",
       (e) => {
         e.preventDefault();
@@ -25769,7 +25804,7 @@ class CanvasRenderer extends Renderer {
       false
     );
     // ctx.restoreContext()
-    this.getScreenCanvas().addEventListener(
+    this.getCanvas().addEventListener(
       "contextrestored",
       () => {
         this.isContextValid = true;
@@ -25795,7 +25830,7 @@ class CanvasRenderer extends Renderer {
    * @memberof CanvasRenderer
    */
   resetTransform() {
-    this.backBufferContext2D.setTransform(1, 0, 0, 1, 0, 0);
+    this.getContext().setTransform(1, 0, 0, 1, 0, 0);
   }
 
   /**
@@ -25837,12 +25872,6 @@ class CanvasRenderer extends Renderer {
         this.currentBlendMode = "normal";
         break;
     }
-
-    // transparent setting will override the given blendmode for this.context
-    if (this.settings.doubleBuffering && this.settings.transparent) {
-      // Clears the front buffer for each frame blit
-      this.context.globalCompositeOperation = "copy";
-    }
   }
 
   /**
@@ -25851,19 +25880,10 @@ class CanvasRenderer extends Renderer {
    * @memberof CanvasRenderer
    */
   clear() {
-    if (this.settings.transparent) {
-      this.clearColor("rgba(0,0,0,0)", true);
-    }
-  }
-
-  /**
-   * render the main framebuffer on screen
-   * @name flush
-   * @memberof CanvasRenderer
-   */
-  flush() {
-    if (this.settings.doubleBuffering) {
-      this.context.drawImage(this.backBufferCanvas, 0, 0);
+    if (this.settings.transparent === false) {
+      var canvas = this.getCanvas();
+      var context = this.getContext();
+      context.clearRect(0, 0, canvas.width, canvas.height);
     }
   }
 
@@ -25874,20 +25894,16 @@ class CanvasRenderer extends Renderer {
    * @param {Color|string} [color="#000000"] CSS color.
    * @param {boolean} [opaque=false] Allow transparency [default] or clear the surface completely [true]
    */
-  clearColor(color = "#000000", opaque) {
+  clearColor(color = "#000000", opaque = false) {
+    var canvas = this.getCanvas();
+    var context = this.getContext();
+
     this.save();
     this.resetTransform();
-    this.backBufferContext2D.globalCompositeOperation = opaque
-      ? "copy"
-      : "source-over";
-    this.backBufferContext2D.fillStyle =
-      color instanceof Color ? color.toRGBA() : color;
-    this.fillRect(
-      0,
-      0,
-      this.backBufferCanvas.width,
-      this.backBufferCanvas.height
-    );
+    context.globalAlpha = 1;
+    context.globalCompositeOperation = opaque === true ? "copy" : "source-over";
+    context.fillStyle = color instanceof Color ? color.toRGBA() : color;
+    this.fillRect(0, 0, canvas.width, canvas.height);
     this.restore();
   }
 
@@ -26247,13 +26263,27 @@ class CanvasRenderer extends Renderer {
   }
 
   /**
-   * return a reference to the system 2d Context
-   * @name getContext
+   * Stroke a Point at the specified coordinates
+   * @name strokePoint
    * @memberof CanvasRenderer
-   * @returns {CanvasRenderingContext2D}
+   * @param {number} x
+   * @param {number} y
    */
-  getContext() {
-    return this.backBufferContext2D;
+  strokePoint(x, y) {
+    this.strokeLine(x, y, x + 1, y + 1);
+  }
+
+  /**
+   * Draw a a point at the specified coordinates
+   * @name fillPoint
+   * @memberof CanvasRenderer
+   * @param {number} x
+   * @param {number} y
+   * @param {number} width
+   * @param {number} height
+   */
+  fillPoint(x, y) {
+    this.strokePoint(x, y);
   }
 
   /**
@@ -26271,7 +26301,7 @@ class CanvasRenderer extends Renderer {
    * @memberof CanvasRenderer
    */
   save() {
-    this.backBufferContext2D.save();
+    this.getContext().save();
   }
 
   /**
@@ -26280,12 +26310,12 @@ class CanvasRenderer extends Renderer {
    * @memberof CanvasRenderer
    */
   restore() {
-    this.backBufferContext2D.restore();
+    this.getContext().restore();
     this.currentColor.glArray[3] = this.getGlobalAlpha();
     this.currentScissor[0] = 0;
     this.currentScissor[1] = 0;
-    this.currentScissor[2] = this.backBufferCanvas.width;
-    this.currentScissor[3] = this.backBufferCanvas.height;
+    this.currentScissor[2] = this.getCanvas().width;
+    this.currentScissor[3] = this.getCanvas().height;
   }
 
   /**
@@ -26295,7 +26325,7 @@ class CanvasRenderer extends Renderer {
    * @param {number} angle in radians
    */
   rotate(angle) {
-    this.backBufferContext2D.rotate(angle);
+    this.getContext().rotate(angle);
   }
 
   /**
@@ -26306,7 +26336,7 @@ class CanvasRenderer extends Renderer {
    * @param {number} y
    */
   scale(x, y) {
-    this.backBufferContext2D.scale(x, y);
+    this.getContext().scale(x, y);
   }
 
   /**
@@ -26317,7 +26347,8 @@ class CanvasRenderer extends Renderer {
    * @param {Color|string} color css color value
    */
   setColor(color) {
-    this.backBufferContext2D.strokeStyle = this.backBufferContext2D.fillStyle =
+    var context = this.getContext();
+    context.strokeStyle = context.fillStyle =
       color instanceof Color ? color.toRGBA() : color;
   }
 
@@ -26328,7 +26359,7 @@ class CanvasRenderer extends Renderer {
    * @param {number} alpha 0.0 to 1.0 values accepted.
    */
   setGlobalAlpha(alpha) {
-    this.backBufferContext2D.globalAlpha = this.currentColor.glArray[3] = alpha;
+    this.getContext().globalAlpha = this.currentColor.glArray[3] = alpha;
   }
 
   /**
@@ -26338,7 +26369,7 @@ class CanvasRenderer extends Renderer {
    * @returns {number} global alpha value
    */
   getGlobalAlpha() {
-    return this.backBufferContext2D.globalAlpha;
+    return this.getContext().globalAlpha;
   }
 
   /**
@@ -26348,7 +26379,7 @@ class CanvasRenderer extends Renderer {
    * @param {number} width Line width
    */
   setLineWidth(width) {
-    this.backBufferContext2D.lineWidth = width;
+    this.getContext().lineWidth = width;
   }
 
   /**
@@ -26383,7 +26414,7 @@ class CanvasRenderer extends Renderer {
       f |= 0;
     }
 
-    this.backBufferContext2D.transform(a, b, c, d, e, f);
+    this.getContext().transform(a, b, c, d, e, f);
   }
 
   /**
@@ -26395,9 +26426,9 @@ class CanvasRenderer extends Renderer {
    */
   translate(x, y) {
     if (this.settings.subPixel === false) {
-      this.backBufferContext2D.translate(~~x, ~~y);
+      this.getContext().translate(~~x, ~~y);
     } else {
-      this.backBufferContext2D.translate(x, y);
+      this.getContext().translate(x, y);
     }
   }
 
@@ -26415,7 +26446,7 @@ class CanvasRenderer extends Renderer {
    * @param {number} height
    */
   clipRect(x, y, width, height) {
-    var canvas = this.backBufferCanvas;
+    var canvas = this.getCanvas();
     // if requested box is different from the current canvas size;
     if (
       x !== 0 ||
@@ -26431,7 +26462,7 @@ class CanvasRenderer extends Renderer {
         currentScissor[2] !== width ||
         currentScissor[3] !== height
       ) {
-        var context = this.backBufferContext2D;
+        var context = this.getContext();
         context.beginPath();
         context.rect(x, y, width, height);
         context.clip();
@@ -26670,6 +26701,15 @@ class TMXLayer extends Renderable {
      * @name TMXLayer#renderorder
      */
     this.renderorder = data.renderorder || "right-down";
+
+    /**
+     * the layer class
+     * @public
+     * @type {string}
+     * @name class
+     * @name TMXLayer#class
+     */
+    this.class = data.class;
 
     // for displaying order
     this.pos.z = z;
@@ -28056,6 +28096,14 @@ class TMXTileset {
     this.isCollection = false;
 
     /**
+     * the tileset class
+     * @public
+     * @type {boolean}
+     * @name TMXTileset#class
+     */
+    this.class = tileset.class;
+
+    /**
      * Tileset animations
      * @private
      */
@@ -28481,20 +28529,32 @@ class TMXObject {
      * object type
      * @public
      * @type {string}
+     * @deprecated since Tiled 1.9
+     * @see https://docs.mapeditor.org/en/stable/reference/tmx-changelog/#tiled-1-9
      * @name type
      * @memberof TMXObject
      */
     this.type = settings.type;
 
     /**
+     * the object class
+     * @public
+     * @type {string}
+     * @name class
+     * @memberof TMXObject
+     */
+    this.class =
+      typeof settings.class !== "undefined" ? settings.class : settings.type;
+
+    /**
      * object text
      * @public
      * @type {object}
      * @see http://docs.mapeditor.org/en/stable/reference/tmx-map-format/#text
-     * @name type
+     * @name text
      * @memberof TMXObject
      */
-    this.type = settings.type;
+    this.text = undefined;
 
     /**
      * The rotation of the object in radians clockwise (defaults to 0)
@@ -28542,6 +28602,15 @@ class TMXObject {
     this.isEllipse = false;
 
     /**
+     * if true, the object is a Point
+     * @public
+     * @type {boolean}
+     * @name isPoint
+     * @memberof TMXObject
+     */
+    this.isPoint = false;
+
+    /**
      * if true, the object is a Polygon
      * @public
      * @type {boolean}
@@ -28565,6 +28634,8 @@ class TMXObject {
     } else {
       if (typeof settings.ellipse !== "undefined") {
         this.isEllipse = true;
+      } else if (typeof settings.point !== "undefined") {
+        this.isPoint = true;
       } else if (typeof settings.polygon !== "undefined") {
         this.points = settings.polygon;
         this.isPolygon = true;
@@ -28647,6 +28718,8 @@ class TMXObject {
           )
           .rotate(this.rotation)
       );
+    } else if (this.isPoint === true) {
+      shapes.push(pool.pull("Point", this.x, this.y));
     } else {
       // add a polygon
       if (this.isPolygon === true) {
@@ -28658,10 +28731,7 @@ class TMXObject {
           );
         }
         shapes.push(_polygon.rotate(this.rotation));
-      }
-
-      // add a polyline
-      else if (this.isPolyLine === true) {
+      } else if (this.isPolyLine === true) {
         var p = this.points;
         var p1, p2;
         var segments = p.length - 1;
@@ -28696,7 +28766,9 @@ class TMXObject {
     // Apply isometric projection
     if (this.orientation === "isometric") {
       for (i = 0; i < shapes.length; i++) {
-        shapes[i].toIso();
+        if (typeof shapes[i].toIso === "function") {
+          shapes[i].toIso();
+        }
       }
     }
 
@@ -28755,6 +28827,15 @@ class TMXGroup {
      * @memberof TMXGroup
      */
     this.tintcolor = data.tintcolor;
+
+    /**
+     * the group class
+     * @public
+     * @type {string}
+     * @name class
+     * @memberof TMXGroup
+     */
+    this.class = data.class;
 
     /**
      * group z order
@@ -29041,6 +29122,14 @@ class TMXTileMap {
      * @name TMXTileMap#tiledversion
      */
     this.tiledversion = data.tiledversion;
+
+    /**
+     * The map class.
+     * @public
+     * @type {string}
+     * @name TMXTileMap#class
+     */
+    this.class = data.class;
 
     // tilesets for this map
     this.tilesets = null;
@@ -29383,6 +29472,8 @@ class TMXTileMap {
             obj.anchorPoint.set(0, 0);
             obj.name = settings.name;
             obj.type = settings.type;
+            // for backward compatibility
+            obj.class = settings.class || settings.type;
             obj.id = settings.id;
             obj.body = new Body(obj, shape);
             obj.body.setStatic(true);
@@ -30703,7 +30794,12 @@ class Sprite extends Renderable {
     }
 
     if (typeof settings.tint !== "undefined") {
-      this.tint.setColor(settings.tint);
+      if (settings.tint instanceof Color) {
+        this.tint.copy(settings.tint);
+      } else {
+        // string (#RGB, #ARGB, #RRGGBB, #AARRGGBB)
+        this.tint.parseCSS(settings.tint);
+      }
     }
 
     // set the sprite name if specified
@@ -32492,10 +32588,10 @@ class WebGLRenderer extends Renderer {
    * @param {number} options.width The width of the canvas without scaling
    * @param {number} options.height The height of the canvas without scaling
    * @param {HTMLCanvasElement} [options.canvas] The html canvas to draw to on screen
-   * @param {boolean} [options.doubleBuffering=false] Whether to enable double buffering (not applicable when using the WebGL Renderer)
    * @param {boolean} [options.antiAlias=false] Whether to enable anti-aliasing
    * @param {boolean} [options.failIfMajorPerformanceCaveat=true] If true, the renderer will switch to CANVAS mode if the performances of a WebGL context would be dramatically lower than that of a native application making equivalent OpenGL calls.
-   * @param {boolean} [options.transparent=false] Whether to enable transparency on the canvas (performance hit when enabled)
+   * @param {boolean} [options.transparent=false] Whether to enable transparency on the canvas
+   * @param {boolean} [options.premultipliedAlpha=true] in WebGL, whether the renderer will assume that colors have premultiplied alpha when canvas transparency is enabled
    * @param {boolean} [options.subPixel=false] Whether to enable subpixel renderering (performance hit when enabled)
    * @param {boolean} [options.preferWebGL1=false] if true the renderer will only use WebGL 1
    * @param {string} [options.powerPreference="default"] a hint to the user agent indicating what configuration of GPU is suitable for the WebGL context ("default", "high-performance", "low-power"). To be noted that Safari and Chrome (since version 80) both default to "low-power" to save battery life and improve the user experience on these dual-GPU machines.
@@ -32509,8 +32605,6 @@ class WebGLRenderer extends Renderer {
 
     /**
      * The WebGL version used by this renderer (1 or 2)
-     * @name WebGLVersion
-     * @memberof WebGLRenderer#
      * @type {number}
      * @default 1
      * @readonly
@@ -32519,8 +32613,6 @@ class WebGLRenderer extends Renderer {
 
     /**
      * The vendor string of the underlying graphics driver.
-     * @name GPUVendor
-     * @memberof WebGLRenderer#
      * @type {string}
      * @default null
      * @readonly
@@ -32529,8 +32621,6 @@ class WebGLRenderer extends Renderer {
 
     /**
      * The renderer string of the underlying graphics driver.
-     * @name GPURenderer
-     * @memberof WebGLRenderer#
      * @type {string}
      * @default null
      * @readonly
@@ -32540,18 +32630,15 @@ class WebGLRenderer extends Renderer {
     /**
      * The WebGL context
      * @name gl
-     * @memberof WebGLRenderer
      * @type {WebGLRenderingContext}
      */
     this.context = this.gl = this.getContextGL(
-      this.getScreenCanvas(),
+      this.getCanvas(),
       options.transparent
     );
 
     /**
      * Maximum number of texture unit supported under the current context
-     * @name maxTextures
-     * @memberof WebGLRenderer#
      * @type {number}
      * @readonly
      */
@@ -32579,25 +32666,19 @@ class WebGLRenderer extends Renderer {
 
     /**
      * The current transformation matrix used for transformations on the overall scene
-     * @name currentTransform
      * @type {Matrix2d}
-     * @memberof WebGLRenderer#
      */
     this.currentTransform = new Matrix2d();
 
     /**
      * The current compositor used by the renderer
-     * @name currentCompositor
      * @type {WebGLCompositor}
-     * @memberof WebGLRenderer#
      */
     this.currentCompositor = null;
 
     /**
      * The list of active compositors
-     * @name compositors
      * @type {Map<WebGLCompositor>}
-     * @memberof WebGLRenderer#
      */
     this.compositors = new Map();
 
@@ -32629,7 +32710,7 @@ class WebGLRenderer extends Renderer {
     // to simulate context lost and restore in WebGL:
     // var ctx = me.video.renderer.context.getExtension('WEBGL_lose_context');
     // ctx.loseContext()
-    this.getScreenCanvas().addEventListener(
+    this.getCanvas().addEventListener(
       "webglcontextlost",
       (e) => {
         e.preventDefault();
@@ -32639,7 +32720,7 @@ class WebGLRenderer extends Renderer {
       false
     );
     // ctx.restoreContext()
-    this.getScreenCanvas().addEventListener(
+    this.getCanvas().addEventListener(
       "webglcontextrestored",
       () => {
         this.reset();
@@ -32652,8 +32733,6 @@ class WebGLRenderer extends Renderer {
 
   /**
    * Reset context state
-   * @name reset
-   * @memberof WebGLRenderer
    */
   reset() {
     super.reset();
@@ -32675,9 +32754,7 @@ class WebGLRenderer extends Renderer {
 
   /**
    * set the active compositor for this renderer
-   * @name setCompositor
    * @param {WebGLCompositor|string} compositor a compositor name or instance
-   * @memberof WebGLRenderer
    */
   setCompositor(compositor = "default") {
     if (typeof compositor === "string") {
@@ -32700,8 +32777,6 @@ class WebGLRenderer extends Renderer {
 
   /**
    * Reset the gl transform to identity
-   * @name resetTransform
-   * @memberof WebGLRenderer
    */
   resetTransform() {
     this.currentTransform.identity();
@@ -32712,7 +32787,7 @@ class WebGLRenderer extends Renderer {
    */
   createFontTexture(cache) {
     if (typeof this.fontTexture === "undefined") {
-      var canvas = this.backBufferCanvas;
+      var canvas = this.getCanvas();
       var width = canvas.width;
       var height = canvas.height;
 
@@ -32749,8 +32824,6 @@ class WebGLRenderer extends Renderer {
 
   /**
    * Create a pattern with the specified repetition
-   * @name createPattern
-   * @memberof WebGLRenderer
    * @param {Image} image Source image
    * @param {string} repeat Define how the pattern should be repeated
    * @returns {TextureAtlas}
@@ -32792,8 +32865,6 @@ class WebGLRenderer extends Renderer {
 
   /**
    * Flush the compositor to the frame buffer
-   * @name flush
-   * @memberof WebGLRenderer
    */
   flush() {
     this.currentCompositor.flush();
@@ -32801,8 +32872,6 @@ class WebGLRenderer extends Renderer {
 
   /**
    * set/change the current projection matrix (WebGL only)
-   * @name setProjection
-   * @memberof WebGLRenderer
    * @param {Matrix3d} matrix
    */
   setProjection(matrix) {
@@ -32811,9 +32880,14 @@ class WebGLRenderer extends Renderer {
   }
 
   /**
+   * prepare the framebuffer for drawing a new frame
+   */
+  clear() {
+    this.currentCompositor.clear(this.settings.transparent ? 0.0 : 1.0);
+  }
+
+  /**
    * Clears the gl context with the given color.
-   * @name clearColor
-   * @memberof WebGLRenderer
    * @param {Color|string} [color="#000000"] CSS color.
    * @param {boolean} [opaque=false] Allow transparency [default] or clear the surface completely [true]
    */
@@ -32835,16 +32909,10 @@ class WebGLRenderer extends Renderer {
       glArray[2],
       opaque === true ? 1.0 : glArray[3]
     );
-    this.currentCompositor.clear();
-
-    // restore default clear Color black
-    this.currentCompositor.clearColor(0.0, 0.0, 0.0, 0.0);
   }
 
   /**
    * Erase the pixels in the given rectangular area by setting them to transparent black (rgba(0,0,0,0)).
-   * @name clearRect
-   * @memberof WebGLRenderer
    * @param {number} x x axis of the coordinate for the rectangle starting point.
    * @param {number} y y axis of the coordinate for the rectangle starting point.
    * @param {number} width The rectangle's width.
@@ -32880,7 +32948,7 @@ class WebGLRenderer extends Renderer {
       uvs[1],
       uvs[2],
       uvs[3],
-      this.currentTint.toUint32()
+      this.currentTint.toUint32(this.getGlobalAlpha())
     );
 
     // Clear font context2D
@@ -32889,8 +32957,6 @@ class WebGLRenderer extends Renderer {
 
   /**
    * Draw an image to the gl context
-   * @name drawImage
-   * @memberof WebGLRenderer
    * @param {Image} image An element to draw into the context. The specification permits any canvas image source (CanvasImageSource), specifically, a CSSImageValue, an HTMLImageElement, an SVGImageElement, an HTMLVideoElement, an HTMLCanvasElement, an ImageBitmap, or an OffscreenCanvas.
    * @param {number} sx The X coordinate of the top left corner of the sub-rectangle of the source image to draw into the destination context.
    * @param {number} sy The Y coordinate of the top left corner of the sub-rectangle of the source image to draw into the destination context.
@@ -32945,14 +33011,12 @@ class WebGLRenderer extends Renderer {
       uvs[1],
       uvs[2],
       uvs[3],
-      this.currentTint.toUint32()
+      this.currentTint.toUint32(this.getGlobalAlpha())
     );
   }
 
   /**
    * Draw a pattern within the given rectangle.
-   * @name drawPattern
-   * @memberof WebGLRenderer
    * @param {TextureAtlas} pattern Pattern object
    * @param {number} x
    * @param {number} y
@@ -32972,37 +33036,21 @@ class WebGLRenderer extends Renderer {
       uvs[1],
       uvs[2],
       uvs[3],
-      this.currentTint.toUint32()
+      this.currentTint.toUint32(this.getGlobalAlpha())
     );
   }
 
   /**
-   * return a reference to the screen canvas corresponding WebGL Context
-   * @name getScreenContext
-   * @memberof WebGLRenderer
-   * @returns {WebGLRenderingContext}
-   */
-  getScreenContext() {
-    return this.gl;
-  }
-
-  /**
-   * Returns the WebGL Context object of the given Canvas
-   * @name getContextGL
-   * @memberof WebGLRenderer
+   * Returns the WebGL Context object of the given canvas element
    * @param {HTMLCanvasElement} canvas
-   * @param {boolean} [transparent=true] use false to disable transparency
+   * @param {boolean} [transparent=false] use true to enable transparency
    * @returns {WebGLRenderingContext}
    */
-  getContextGL(canvas, transparent) {
+  getContextGL(canvas, transparent = false) {
     if (typeof canvas === "undefined" || canvas === null) {
       throw new Error(
         "You must pass a canvas element in order to create " + "a GL context"
       );
-    }
-
-    if (typeof transparent !== "boolean") {
-      transparent = true;
     }
 
     var attr = {
@@ -33011,7 +33059,9 @@ class WebGLRenderer extends Renderer {
       depth: false,
       stencil: true,
       preserveDrawingBuffer: false,
-      premultipliedAlpha: transparent,
+      premultipliedAlpha: transparent
+        ? this.settings.premultipliedAlpha
+        : false,
       powerPreference: this.settings.powerPreference,
       failIfMajorPerformanceCaveat: this.settings.failIfMajorPerformanceCaveat,
     };
@@ -33044,8 +33094,6 @@ class WebGLRenderer extends Renderer {
   /**
    * Returns the WebGLContext instance for the renderer
    * return a reference to the system 2d Context
-   * @name getContext
-   * @memberof WebGLRenderer
    * @returns {WebGLRenderingContext}
    */
   getContext() {
@@ -33063,9 +33111,7 @@ class WebGLRenderer extends Renderer {
    * <img src="images/lighter-blendmode.png" width="510"/> <br>
    * - "screen" : The pixels are inverted, multiplied, and inverted again. A lighter picture is the result (opposite of multiply) <br>
    * <img src="images/screen-blendmode.png" width="510"/> <br>
-   * @name setBlendMode
    * @see https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation
-   * @memberof WebGLRenderer
    * @param {string} [mode="normal"] blend mode : "normal", "multiply", "lighter", "additive", "screen"
    * @param {WebGLRenderingContext} [gl]
    */
@@ -33115,8 +33161,6 @@ class WebGLRenderer extends Renderer {
 
   /**
    * restores the canvas context
-   * @name restore
-   * @memberof WebGLRenderer
    */
   restore() {
     // do nothing if there is no saved states
@@ -33143,15 +33187,13 @@ class WebGLRenderer extends Renderer {
       this.gl.disable(this.gl.SCISSOR_TEST);
       this.currentScissor[0] = 0;
       this.currentScissor[1] = 0;
-      this.currentScissor[2] = this.backBufferCanvas.width;
-      this.currentScissor[3] = this.backBufferCanvas.height;
+      this.currentScissor[2] = this.getCanvas().width;
+      this.currentScissor[3] = this.getCanvas().height;
     }
   }
 
   /**
    * saves the canvas context
-   * @name save
-   * @memberof WebGLRenderer
    */
   save() {
     this._colorStack.push(this.currentColor.clone());
@@ -33167,8 +33209,6 @@ class WebGLRenderer extends Renderer {
 
   /**
    * rotates the uniform matrix
-   * @name rotate
-   * @memberof WebGLRenderer
    * @param {number} angle in radians
    */
   rotate(angle) {
@@ -33177,8 +33217,6 @@ class WebGLRenderer extends Renderer {
 
   /**
    * scales the uniform matrix
-   * @name scale
-   * @memberof WebGLRenderer
    * @param {number} x
    * @param {number} y
    */
@@ -33197,8 +33235,6 @@ class WebGLRenderer extends Renderer {
 
   /**
    * Set the global alpha
-   * @name setGlobalAlpha
-   * @memberof WebGLRenderer
    * @param {number} alpha 0.0 to 1.0 values accepted.
    */
   setGlobalAlpha(alpha) {
@@ -33207,8 +33243,6 @@ class WebGLRenderer extends Renderer {
 
   /**
    * Return the global alpha
-   * @name getGlobalAlpha
-   * @memberof WebGLRenderer
    * @returns {number} global alpha value
    */
   getGlobalAlpha() {
@@ -33218,8 +33252,6 @@ class WebGLRenderer extends Renderer {
   /**
    * Set the current fill & stroke style color.
    * By default, or upon reset, the value is set to #000000.
-   * @name setColor
-   * @memberof WebGLRenderer
    * @param {Color|string} color css color string.
    */
   setColor(color) {
@@ -33230,18 +33262,14 @@ class WebGLRenderer extends Renderer {
 
   /**
    * Set the line width
-   * @name setLineWidth
-   * @memberof WebGLRenderer
    * @param {number} width Line width
    */
   setLineWidth(width) {
-    this.getScreenContext().lineWidth(width);
+    this.getContext().lineWidth(width);
   }
 
   /**
    * Stroke an arc at the specified coordinates with given radius, start and end points
-   * @name strokeArc
-   * @memberof WebGLRenderer
    * @param {number} x arc center point x-axis
    * @param {number} y arc center point y-axis
    * @param {number} radius
@@ -33273,8 +33301,6 @@ class WebGLRenderer extends Renderer {
 
   /**
    * Fill an arc at the specified coordinates with given radius, start and end points
-   * @name fillArc
-   * @memberof WebGLRenderer
    * @param {number} x arc center point x-axis
    * @param {number} y arc center point y-axis
    * @param {number} radius
@@ -33288,8 +33314,6 @@ class WebGLRenderer extends Renderer {
 
   /**
    * Stroke an ellipse at the specified coordinates with given radius
-   * @name strokeEllipse
-   * @memberof WebGLRenderer
    * @param {number} x ellipse center point x-axis
    * @param {number} y ellipse center point y-axis
    * @param {number} w horizontal radius of the ellipse
@@ -33319,8 +33343,6 @@ class WebGLRenderer extends Renderer {
 
   /**
    * Fill an ellipse at the specified coordinates with given radius
-   * @name fillEllipse
-   * @memberof WebGLRenderer
    * @param {number} x ellipse center point x-axis
    * @param {number} y ellipse center point y-axis
    * @param {number} w horizontal radius of the ellipse
@@ -33332,8 +33354,6 @@ class WebGLRenderer extends Renderer {
 
   /**
    * Stroke a line of the given two points
-   * @name strokeLine
-   * @memberof WebGLRenderer
    * @param {number} startX the start x coordinate
    * @param {number} startY the start y coordinate
    * @param {number} endX the end x coordinate
@@ -33352,8 +33372,6 @@ class WebGLRenderer extends Renderer {
 
   /**
    * Fill a line of the given two points
-   * @name fillLine
-   * @memberof WebGLRenderer
    * @param {number} startX the start x coordinate
    * @param {number} startY the start y coordinate
    * @param {number} endX the end x coordinate
@@ -33365,8 +33383,6 @@ class WebGLRenderer extends Renderer {
 
   /**
    * Stroke a me.Polygon on the screen with a specified color
-   * @name strokePolygon
-   * @memberof WebGLRenderer
    * @param {Polygon} poly the shape to draw
    * @param {boolean} [fill=false] also fill the shape with the current color if true
    */
@@ -33402,8 +33418,6 @@ class WebGLRenderer extends Renderer {
 
   /**
    * Fill a me.Polygon on the screen
-   * @name fillPolygon
-   * @memberof WebGLRenderer
    * @param {Polygon} poly the shape to draw
    */
   fillPolygon(poly) {
@@ -33412,8 +33426,6 @@ class WebGLRenderer extends Renderer {
 
   /**
    * Draw a stroke rectangle at the specified coordinates
-   * @name strokeRect
-   * @memberof WebGLRenderer
    * @param {number} x
    * @param {number} y
    * @param {number} width
@@ -33442,8 +33454,6 @@ class WebGLRenderer extends Renderer {
 
   /**
    * Draw a filled rectangle at the specified coordinates
-   * @name fillRect
-   * @memberof WebGLRenderer
    * @param {number} x
    * @param {number} y
    * @param {number} width
@@ -33455,8 +33465,6 @@ class WebGLRenderer extends Renderer {
 
   /**
    * Stroke a rounded rectangle at the specified coordinates
-   * @name strokeRoundRect
-   * @memberof WebGLRenderer
    * @param {number} x
    * @param {number} y
    * @param {number} width
@@ -33487,8 +33495,6 @@ class WebGLRenderer extends Renderer {
 
   /**
    * Draw a rounded filled rectangle at the specified coordinates
-   * @name fillRoundRect
-   * @memberof WebGLRenderer
    * @param {number} x
    * @param {number} y
    * @param {number} width
@@ -33500,10 +33506,28 @@ class WebGLRenderer extends Renderer {
   }
 
   /**
+   * Stroke a Point at the specified coordinates
+   * @param {number} x
+   * @param {number} y
+   */
+  strokePoint(x, y) {
+    this.strokeLine(x, y, x + 1, y + 1);
+  }
+
+  /**
+   * Draw a a point at the specified coordinates
+   * @param {number} x
+   * @param {number} y
+   * @param {number} width
+   * @param {number} height
+   */
+  fillPoint(x, y) {
+    this.strokePoint(x, y);
+  }
+
+  /**
    * Reset (overrides) the renderer transformation matrix to the
    * identity one, and then apply the given transformation matrix.
-   * @name setTransform
-   * @memberof WebGLRenderer
    * @param {Matrix2d} mat2d Matrix to transform by
    */
   setTransform(mat2d) {
@@ -33513,8 +33537,6 @@ class WebGLRenderer extends Renderer {
 
   /**
    * Multiply given matrix into the renderer tranformation matrix
-   * @name transform
-   * @memberof WebGLRenderer
    * @param {Matrix2d} mat2d Matrix to transform by
    */
   transform(mat2d) {
@@ -33530,8 +33552,6 @@ class WebGLRenderer extends Renderer {
 
   /**
    * Translates the uniform matrix by the given coordinates
-   * @name translate
-   * @memberof WebGLRenderer
    * @param {number} x
    * @param {number} y
    */
@@ -33552,15 +33572,13 @@ class WebGLRenderer extends Renderer {
    * You can however save the current region using the save(),
    * and restore it (with the restore() method) any time in the future.
    * (<u>this is an experimental feature !</u>)
-   * @name clipRect
-   * @memberof WebGLRenderer
    * @param {number} x
    * @param {number} y
    * @param {number} width
    * @param {number} height
    */
   clipRect(x, y, width, height) {
-    var canvas = this.backBufferCanvas;
+    var canvas = this.getCanvas();
     var gl = this.gl;
     // if requested box is different from the current canvas size
     if (
@@ -33608,8 +33626,6 @@ class WebGLRenderer extends Renderer {
    * A mask limits rendering elements to the shape and position of the given mask object.
    * So, if the renderable is larger than the mask, only the intersecting part of the renderable will be visible.
    * Mask are not preserved through renderer context save and restore.
-   * @name setMask
-   * @memberof WebGLRenderer
    * @param {Rect|RoundRect|Polygon|Line|Ellipse} [mask] a shape defining the mask to be applied
    * @param {boolean} [invert=false] either the given shape should define what is visible (default) or the opposite
    */
@@ -33650,9 +33666,7 @@ class WebGLRenderer extends Renderer {
 
   /**
    * disable (remove) the rendering mask set through setMask.
-   * @name clearMask
    * @see WebGLRenderer#setMask
-   * @memberof WebGLRenderer
    */
   clearMask() {
     if (this.maskLevel > 0) {
@@ -33677,11 +33691,11 @@ var designHeight = 0;
 var settings = {
   parent: undefined,
   renderer: 2, // AUTO
-  doubleBuffering: false,
   autoScale: false,
   scale: 1.0,
-  scaleMethod: "fit",
+  scaleMethod: "manual",
   transparent: false,
+  premultipliedAlpha: true,
   blendMode: "normal",
   antiAlias: false,
   failIfMajorPerformanceCaveat: true,
@@ -33721,7 +33735,7 @@ function onresize() {
     var canvasMaxHeight = Infinity;
 
     if (globalThis.getComputedStyle) {
-      var style = globalThis.getComputedStyle(renderer.getScreenCanvas(), null);
+      var style = globalThis.getComputedStyle(renderer.getCanvas(), null);
       canvasMaxWidth = parseInt(style.maxWidth, 10) || Infinity;
       canvasMaxHeight = parseInt(style.maxHeight, 10) || Infinity;
     }
@@ -33775,6 +33789,9 @@ function onresize() {
 
     // adjust scaling ratio based on the new scaling ratio
     scale(scaleX, scaleY);
+  } else {
+    // adjust scaling ratio based on the given settings
+    scale(settings.scale, settings.scale);
   }
 }
 /**
@@ -33851,7 +33868,6 @@ let renderer = null;
  * @param {object} [options] The optional video/renderer parameters.<br> (see Renderer(s) documentation for further specific options)
  * @param {string|HTMLElement} [options.parent=document.body] the DOM parent element to hold the canvas in the HTML file
  * @param {number} [options.renderer=video.AUTO] renderer to use (me.video.CANVAS, me.video.WEBGL, me.video.AUTO)
- * @param {boolean} [options.doubleBuffering=false] enable/disable double buffering
  * @param {number|string} [options.scale=1.0] enable scaling of the canvas ('auto' for automatic scaling)
  * @param {string} [options.scaleMethod="fit"] screen scaling modes ('fit','fill-min','fill-max','flex','flex-width','flex-height','stretch')
  * @param {boolean} [options.preferWebGL1=false] if true the renderer will only use WebGL 1
@@ -33866,8 +33882,7 @@ let renderer = null;
  *     parent : "screen",
  *     renderer : me.video.AUTO,
  *     scale : "auto",
- *     scaleMethod : "fit",
- *     doubleBuffering : true
+ *     scaleMethod : "fit"
  * });
  */
 function init(width, height, options) {
@@ -33882,7 +33897,6 @@ function init(width, height, options) {
   // sanitize potential given parameters
   settings.width = width;
   settings.height = height;
-  settings.doubleBuffering = !!settings.doubleBuffering;
   settings.transparent = !!settings.transparent;
   settings.antiAlias = !!settings.antiAlias;
   settings.failIfMajorPerformanceCaveat =
@@ -33907,7 +33921,7 @@ function init(width, height, options) {
     console.log("melonJS 2 (v" + version + ") | http://melonjs.org");
   }
 
-  // override renderer settings if &webgl is defined in the URL
+  // override renderer settings if &webgl or &canvas is defined in the URL
   var uriFragment = utils.getUriFragment();
   if (
     uriFragment.webgl === true ||
@@ -33918,16 +33932,13 @@ function init(width, height, options) {
     if (uriFragment.webgl1 === true) {
       settings.preferWebGL1 = true;
     }
+  } else if (uriFragment.canvas === true) {
+    settings.renderer = CANVAS;
   }
 
   // normalize scale
   settings.scale = settings.autoScale ? 1.0 : +settings.scale || 1.0;
   scaleRatio.set(settings.scale, settings.scale);
-
-  // force double buffering if scaling is required
-  if (settings.autoScale || settings.scale !== 1.0) {
-    settings.doubleBuffering = true;
-  }
 
   // hold the requested video size ratio
   designRatio = width / height;
@@ -34003,7 +34014,7 @@ function init(width, height, options) {
   parent = getElement(
     typeof settings.parent !== "undefined" ? settings.parent : document.body
   );
-  parent.appendChild(renderer.getScreenCanvas());
+  parent.appendChild(renderer.getCanvas());
 
   // Mobile browser hacks
   if (platform.isMobile) {
@@ -34127,8 +34138,8 @@ function getParent() {
  * @param {number} y y scaling multiplier
  */
 function scale(x, y) {
-  var canvas = renderer.getScreenCanvas();
-  var context = renderer.getScreenContext();
+  var canvas = renderer.getCanvas();
+  var context = renderer.getContext();
   var settings = renderer.settings;
   var pixelRatio = devicePixelRatio;
 
@@ -34974,10 +34985,10 @@ class BasePlugin {
      * this can be overridden by the plugin
      * @public
      * @type {string}
-     * @default "13.0.0"
+     * @default "13.3.0"
      * @name plugin.Base#version
      */
-    this.version = "13.0.0";
+    this.version = "13.3.0";
   }
 }
 
@@ -35915,6 +35926,7 @@ var defaultAttributes = {
   offscreenCanvas: false,
   willReadFrequently: false,
   antiAlias: false,
+  context: "2d",
 };
 
 /**
@@ -35924,7 +35936,8 @@ class CanvasTexture {
   /**
    * @param {number} width the desired width of the canvas
    * @param {number} height the desired height of the canvas
-   * @param {object} attributes The attributes to create both the canvas and 2d context
+   * @param {object} attributes The attributes to create both the canvas and context
+   * @param {boolean} [attributes.context="2d"] the context type to be created ("2d", "webgl", "webgl2")
    * @param {boolean} [attributes.offscreenCanvas=false] will create an offscreenCanvas if true instead of a standard canvas
    * @param {boolean} [attributes.willReadFrequently=false] Indicates whether or not a lot of read-back operations are planned
    * @param {boolean} [attributes.antiAlias=false] Whether to enable anti-aliasing, use false (default) for a pixelated effect.
@@ -36150,7 +36163,7 @@ class TextMetrics extends Bounds {
 
     for (var i = 0; i < strings.length; i++) {
       this.width = Math.max(
-        this.lineWidth(strings[i].trimRight(), context),
+        this.lineWidth(strings[i].trimEnd(), context),
         this.width
       );
       this.height += this.lineHeight();
@@ -36649,7 +36662,7 @@ class Text extends Renderable {
     setContextStyle(context, this, stroke);
 
     for (var i = 0; i < text.length; i++) {
-      var string = text[i].trimRight();
+      var string = text[i].trimEnd();
       // draw the string
       context[stroke ? "strokeText" : "fillText"](string, x, y);
       // add leading space
@@ -36805,12 +36818,7 @@ class BitmapText extends Renderable {
 
     // apply given fillstyle
     if (typeof settings.fillStyle !== "undefined") {
-      if (settings.fillStyle instanceof Color) {
-        this.fillStyle.setColor(settings.fillStyle);
-      } else {
-        // string (#RGB, #ARGB, #RRGGBB, #AARRGGBB)
-        this.fillStyle.parseCSS(settings.fillStyle);
-      }
+      this.fillStyle = settings.fillStyle;
     }
 
     // update anchorPoint if provided
@@ -36883,7 +36891,12 @@ class BitmapText extends Renderable {
     return this.tint;
   }
   set fillStyle(value) {
-    this.tint = value;
+    if (value instanceof Color) {
+      this.tint.copy(value);
+    } else {
+      // string (#RGB, #ARGB, #RRGGBB, #AARRGGBB)
+      this.tint.parseCSS(value);
+    }
   }
 
   /**
@@ -36940,7 +36953,7 @@ class BitmapText extends Renderable {
 
     for (var i = 0; i < this._text.length; i++) {
       x = lX;
-      var string = this._text[i].trimRight();
+      var string = this._text[i].trimEnd();
       // adjust x pos based on alignment value
       var stringWidth = this.metrics.lineWidth(string);
       switch (this.textAlign) {
@@ -37712,12 +37725,38 @@ class NineSliceSprite extends Sprite {
     this.width = Math.floor(settings.width);
     this.height = Math.floor(settings.height);
 
-    // nine slice sprite specific local variables
+    // nine slice sprite specific internal variables
     this.nss_width = this.width;
     this.nss_height = this.height;
 
     this.insetx = settings.insetx;
     this.insety = settings.insety;
+  }
+
+  /**
+   * width of the NineSliceSprite
+   * @public
+   * @type {number}
+   * @name width
+   */
+  get width() {
+    return super.width;
+  }
+  set width(value) {
+    super.width = this.nss_width = value;
+  }
+
+  /**
+   * height of the NineSliceSprite
+   * @public
+   * @type {number}
+   * @name height
+   */
+  get height() {
+    return super.height;
+  }
+  set height(value) {
+    super.height = this.nss_height = value;
   }
 
   /**
@@ -39801,6 +39840,33 @@ class DroptargetEntity extends DropTarget {
   }
 }
 
+/**
+ * return a reference to the screen canvas
+ * @name getScreenCanvas
+ * @memberof Renderer
+ * @returns {HTMLCanvasElement}
+ * @deprecated since 13.1.0
+ * @see getCanvas();
+ */
+Renderer.prototype.getScreenCanvas = function () {
+  warning("getScreenCanvas", "getCanvas", "13.1.0");
+  return this.getCanvas();
+};
+
+/**
+ * return a reference to the screen canvas corresponding 2d Context<br>
+ * (will return buffered context if double buffering is enabled, or a reference to the Screen Context)
+ * @name getScreenContext
+ * @memberof Renderer
+ * @returns {CanvasRenderingContext2D}
+ * @deprecated since 13.1.0
+ * @see getContext();
+ */
+Renderer.prototype.getScreenContext = function () {
+  warning("getScreenContext", "getContext", "13.1.0");
+  return this.getContext();
+};
+
 // ES5/ES6 polyfills
 
 /**
@@ -39810,7 +39876,7 @@ class DroptargetEntity extends DropTarget {
  * @name version
  * @type {string}
  */
-const version = "13.0.0";
+const version = "13.3.0";
 
 /**
  * a flag indicating that melonJS is fully initialized
@@ -39868,6 +39934,7 @@ function boot() {
   pool.register("me.RoundRect", RoundRect, true);
   pool.register("me.Polygon", Polygon, true);
   pool.register("me.Line", Line, true);
+  pool.register("me.Point", Point, true);
   pool.register("me.Ellipse", Ellipse, true);
   pool.register("me.Bounds", Bounds, true);
 
@@ -39897,6 +39964,7 @@ function boot() {
   pool.register("RoundRect", RoundRect, true);
   pool.register("Polygon", Polygon, true);
   pool.register("Line", Line, true);
+  pool.register("Point", Point, true);
   pool.register("Ellipse", Ellipse, true);
   pool.register("Bounds", Bounds, true);
   pool.register("CanvasTexture", CanvasTexture, true);
@@ -39951,6 +40019,7 @@ export {
   Particle,
   ParticleEmitter,
   ParticleEmitterSettings,
+  Point,
   Pointer,
   Polygon,
   QuadTree,

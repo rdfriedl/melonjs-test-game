@@ -1,4 +1,4 @@
-import { GRID } from "../const/map.js";
+import { GRID } from "../const/grid.js";
 import { SnappedVec2d } from "../helpers/snapped-vec-2d.js";
 import me from "../lib/melon.js";
 import { getCellInteraction } from "../services/interactions.js";

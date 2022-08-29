@@ -1,4 +1,4 @@
-import { GRID } from "../const/map.js";
+import { GRID } from "../const/grid.js";
 import me from "../lib/melon.js";
 
 export default class TunnelEntity extends me.Sprite {

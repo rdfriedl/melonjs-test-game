@@ -18,7 +18,6 @@ me.device.onReady(() => {
       parent: "screen",
       scale: "auto",
       scaleMethod: "fill-max",
-      consoleHeader: true,
     })
   ) {
     alert("Your browser does not support HTML5 canvas.");

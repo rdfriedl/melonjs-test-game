@@ -1,10 +1,10 @@
 import me from "../lib/melon.js";
 import { SnappedVec2d } from "../helpers/snapped-vec-2d.js";
-import { GRID } from "../const/map.js";
+import { GRID } from "../const/grid.js";
 import { canMoveTo } from "../services/navgrid.js";
 import CharacterWalkSprite from "./CharacterWalkSprite.js";
 
-const MOVE_SPEED = 0.8;
+const MOVE_SPEED = GRID / 12;
 const halfGrid = new me.Vector2d(GRID, GRID).scale(0.5);
 
 function moveVec2d(vec, to, speed) {
@@ -26,6 +26,14 @@ function moveVec2d(vec, to, speed) {
   return new me.Vector2d(Math.sign(diff.x), Math.sign(diff.y));
 }
 
+const INPUT_DIRECTIONS = {
+  none: new me.Vector2d(0, 0),
+  up: new me.Vector2d(0, -1),
+  left: new me.Vector2d(-1, 0),
+  down: new me.Vector2d(0, 1),
+  right: new me.Vector2d(1, 0),
+};
+
 export default class AgentEntity extends me.Entity {
   constructor(x, y) {
     super(x, y, { height: GRID, width: GRID });
@@ -38,7 +46,13 @@ export default class AgentEntity extends me.Entity {
       image: "HumanBaseAnimations",
     });
 
+    this.inputDirStack = [];
     this.renderable = this.walk;
+
+    // this.posTween = new me.Tween(this.pos);
+    // this.moving = false;
+    // this.posTween.onStart(() => this.moving = true)
+    // this.posTween.onComplete(() => this.moving = false)
 
     this.cell = new SnappedVec2d(this.pos);
     this.moveToCell = new me.Vector2d().copy(this.cell);
@@ -46,13 +60,21 @@ export default class AgentEntity extends me.Entity {
   }
 
   getInputDirection() {
-    const dir = new me.Vector2d(0, 0);
-    if (me.input.isKeyPressed("left")) dir.x = -1;
-    else if (me.input.isKeyPressed("right")) dir.x = 1;
-    else if (me.input.isKeyPressed("up")) dir.y = -1;
-    else if (me.input.isKeyPressed("down")) dir.y = 1;
+    for (const [key, dir] of Object.entries(INPUT_DIRECTIONS)) {
+      if (me.input.isKeyPressed(key)) {
+        if (!this.inputDirStack.includes(key)) {
+          this.inputDirStack.push(key);
+        }
+      } else if (this.inputDirStack.includes(key)) {
+        this.inputDirStack.splice(this.inputDirStack.indexOf(key), 1);
+      }
+    }
+    console.log(this.inputDirStack);
 
-    return dir;
+    return (
+      INPUT_DIRECTIONS[this.inputDirStack[this.inputDirStack.length - 1]] ??
+      INPUT_DIRECTIONS.none
+    );
   }
 
   update(dt) {
@@ -74,6 +96,18 @@ export default class AgentEntity extends me.Entity {
         }
       }
     }
+
+    // if (!this.moving) {
+    //   this.targetCell.copy(this.cell).add(inputDir);
+
+    //   if (inputDir.length() && canMoveTo(this.cell, this.targetCell)) {
+    //     this.posTween.to(this.targetCell.clone().scale(GRID).add(halfGrid), {
+    //       easing: me.Tween.Easing.Linear.None,
+    //       duration: 100,
+    //       autoStart: true
+    //     });
+    //   }
+    // }
 
     const moved = moveVec2d(this.pos, moveToPos, MOVE_SPEED);
     this.walk.moved.copy(moved);
