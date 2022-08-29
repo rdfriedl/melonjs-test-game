@@ -9,7 +9,7 @@ const imageFrames = (x, y, w, count) =>
 
 const MOVE_SPEED = 1;
 
-export default class PlayerEntity extends me.Sprite {
+export default class OldPlayerEntity extends me.Sprite {
   constructor(x, y) {
     // call the constructor
     super(x, y, {

@@ -81,6 +81,15 @@ export function addCellWall(cell, layer, wall = WALLS.EMPTY) {
 }
 
 // helper methods
+export function canMoveTo(from, to) {
+  const walls = getCellWalls(to);
+  if (from.x < to.x) return !(walls & WALLS.LEFT);
+  else if (from.x > to.x) return !(walls & WALLS.RIGHT);
+  else if (from.y < to.y) return !(walls & WALLS.TOP);
+  else if (from.y > to.y) return !(walls & WALLS.BOTTOM);
+  return true;
+}
+
 const v = (x, y) => new me.Vector2d(x, y);
 export function setWallsFromTmxLayer(layer, tmxLayer) {
   // clear the layer first

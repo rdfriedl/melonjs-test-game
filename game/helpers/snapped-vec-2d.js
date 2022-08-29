@@ -2,8 +2,9 @@ import { GRID } from "../const/map.js";
 import me from "../lib/melon.js";
 
 export class SnappedVec2d extends me.Vector2d {
-  constructor(vec) {
-    super(Math.floor(vec.x / GRID), Math.floor(vec.y / GRID));
+  constructor(vec, grid = GRID) {
+    super(Math.floor(vec.x / grid), Math.floor(vec.y / grid));
+    this.grid = grid;
     this.vec = vec;
 
     // attach to the pos update callback
@@ -11,7 +12,7 @@ export class SnappedVec2d extends me.Vector2d {
     this._oldScope = vec.scope;
     this.vec.setCallback(this._handleEntityPosUpdate, this);
 
-    this.set(Math.floor(vec.x / GRID), Math.floor(vec.y / GRID));
+    this.set(Math.floor(vec.x / grid), Math.floor(vec.y / grid));
   }
 
   _handleEntityPosUpdate(newX, newY, oldX, oldY) {
@@ -29,7 +30,7 @@ export class SnappedVec2d extends me.Vector2d {
     } else {
       y = newY;
     }
-    this.set(Math.floor(x / GRID), Math.floor(y / GRID));
+    this.set(Math.floor(x / this.grid), Math.floor(y / this.grid));
 
     return ret;
   }

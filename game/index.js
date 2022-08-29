@@ -1,10 +1,10 @@
 import me from "./lib/melon.js";
 import { globalResources, hubWorldResources } from "./resources.js";
-import PlayerEntity from "../entities/player.js";
 import PlayScreen from "./screens/play.js";
 import { loadPack } from "./services/resource-manager.js";
 import TeleporterEntity from "./entities/teleporter.js";
 import TunnelEntity from "./entities/tunnel.js";
+import AgentEntity from "./entities/Agent.js";
 import SignEntity from "./entities/sign.js";
 import "./services/world-manager.js";
 
@@ -26,7 +26,7 @@ me.device.onReady(() => {
   }
 
   // setup game objects
-  me.pool.register("Player", PlayerEntity);
+  me.pool.register("Player", AgentEntity);
   me.pool.register("sign", SignEntity);
 
   // island doors

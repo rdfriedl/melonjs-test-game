@@ -12,7 +12,7 @@ window.debug = {
   levelManager,
   ambossService,
   seedrandom,
-  get player() {
-    return me.state.current()?.getPlayer();
+  get agent() {
+    return me.state.current()?.getAgent();
   },
 };
