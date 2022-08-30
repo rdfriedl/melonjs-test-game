@@ -17,7 +17,9 @@ export default class SignEntity extends me.Sprite {
 
     this.cell = new me.Vector2d(x, y).div(GRID).floor();
 
-    setCellInteraction(this.cell, INTERACTION_SIDE.ALL, () => console.info("sign"));
+    setCellInteraction(this.cell, INTERACTION_SIDE.ALL, () =>
+      console.info("sign")
+    );
     addCellWall(this.cell, NAV_LAYERS.SIGNS, WALLS.ALL);
   }
 

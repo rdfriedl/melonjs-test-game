@@ -1,7 +1,7 @@
 import me from "../lib/melon.js";
 import { NAV_LAYER } from "../const/map.js";
 import { NAV_LAYERS } from "../const/nav.js";
-import { setGridSize, setWallsFromTmxLayer } from "./navgrid.js";
+import { compiledGrid, setGridSize, setWallsFromTmxLayer } from "./navgrid.js";
 import { updateNavGrid } from "./pathfinder.js";
 
 export function loadLevel(name) {
@@ -30,6 +30,7 @@ export function loadLevel(name) {
       }
 
       // update the nav grid
+      compiledGrid();
       updateNavGrid();
 
       mapContainer.currentTransform.scale(1);

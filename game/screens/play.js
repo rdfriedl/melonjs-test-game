@@ -11,9 +11,19 @@ class PlayScreen extends me.Stage {
     me.input.bindKey(me.input.KEY.DOWN, "down");
     me.input.bindKey(me.input.KEY.LEFT, "left");
     me.input.bindKey(me.input.KEY.RIGHT, "right");
+    me.input.bindKey(me.input.KEY.W, "up");
+    me.input.bindKey(me.input.KEY.S, "down");
+    me.input.bindKey(me.input.KEY.A, "left");
+    me.input.bindKey(me.input.KEY.D, "right");
+
     me.input.bindKey(me.input.KEY.X, "attack");
+    me.input.bindKey(me.input.KEY.F, "attack");
+
     me.input.bindKey(me.input.KEY.Z, "alt");
+    me.input.bindKey(me.input.KEY.Q, "alt");
+
     me.input.bindKey(me.input.KEY.C, "confirm");
+    me.input.bindKey(me.input.KEY.E, "confirm");
 
     me.event.on(me.event.GAME_UPDATE, this.onGameUpdate, this);
 

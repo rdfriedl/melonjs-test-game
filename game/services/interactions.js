@@ -2,12 +2,13 @@ import { DIRECTION } from "../const/direction.js";
 
 export const INTERACTION_SIDE = {
   NONE: 0,
-  RIGHT: 1,
-  LEFT: 2,
-  UP: 4,
-  DOWN: 8,
-  UNDER: 16,
-  ALL: 1 | 2 | 4 | 8 | 16,
+  RIGHT: 1 << 0,
+  LEFT: 1 << 1,
+  UP: 1 << 2,
+  DOWN: 1 << 3,
+  UNDER: 1 << 4,
+  STAND: 1 << 5,
+  ALL: 1 | 2 | 4 | 8,
 };
 
 export const DIRECTION_TO_SIDE = {

@@ -46,7 +46,7 @@ export default class AgentEntity extends me.Entity {
 
     this.alwaysUpdate = true;
 
-    me.game.viewport.follow(this, me.game.viewport.AXIS.BOTH, 1);
+    me.game.viewport.follow(this, me.game.viewport.AXIS.BOTH, 0.8);
 
     this.walk = new CharacterWalkSprite(0, 0, {
       image: "HumanBaseAnimations",
@@ -65,7 +65,8 @@ export default class AgentEntity extends me.Entity {
     this.moveToCell = new me.Vector2d().copy(this.cell);
     this.targetCell = new me.Vector2d().copy(this.cell);
 
-    this._interactionDown = false;
+    this._wasInteractionKeyPressed = false;
+    this._hasSteppedOnCell = false;
   }
 
   getInputDirection() {
@@ -94,6 +95,12 @@ export default class AgentEntity extends me.Entity {
       interaction.callback();
     }
   }
+  interactStepOnCell() {
+    const interaction = getCellInteraction(this.cell, INTERACTION_SIDE.STAND);
+    if (interaction) {
+      interaction.callback();
+    }
+  }
 
   update(dt) {
     const inputDir = this.getInputDirection();
@@ -109,6 +116,12 @@ export default class AgentEntity extends me.Entity {
     if (distance <= MOVE_SPEED) {
       this.targetCell.copy(this.cell).add(inputDir);
 
+      // step on the cell
+      if (!this._hasSteppedOnCell) {
+        this.interactStepOnCell();
+        this._hasSteppedOnCell = true;
+      }
+
       if (
         (inputDir.x !== 0 && this.pos.y === moveToPos.y) ||
         (inputDir.y !== 0 && this.pos.x === moveToPos.x)
@@ -116,6 +129,7 @@ export default class AgentEntity extends me.Entity {
         if (canMoveTo(this.cell, this.targetCell)) {
           this.moveToCell.copy(this.targetCell);
           moveToPos.copy(this.moveToCell).scale(GRID).add(halfGrid);
+          this._hasSteppedOnCell = false;
         }
       }
     }
@@ -135,10 +149,10 @@ export default class AgentEntity extends me.Entity {
     const moved = moveVec2d(this.pos, moveToPos, MOVE_SPEED);
     this.walk.moved.copy(moved);
 
-    if (!this._interactionDown && me.input.isKeyPressed("confirm")) {
+    if (!this._wasInteractionKeyPressed && me.input.isKeyPressed("confirm")) {
       this.interact();
     }
-    this._interactionDown = me.input.isKeyPressed("confirm");
+    this._wasInteractionKeyPressed = me.input.isKeyPressed("confirm");
 
     super.update(dt);
     return true;
