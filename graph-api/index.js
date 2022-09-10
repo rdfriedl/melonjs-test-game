@@ -3,6 +3,7 @@ import express from "express";
 import logger from "morgan";
 import createError from "http-errors";
 import lndconnect from "lndconnect";
+import cors from "cors";
 
 import {
   authenticatedLndGrpc,
@@ -20,13 +21,19 @@ const { lnd } = authenticatedLndGrpc({
 
 const app = express();
 
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-function pruneNodeData(nodeData) {
+function pruneNodeData(nodeData, pubKey) {
   return {
     alias: nodeData.alias,
+    pubKey,
     color: nodeData.color,
     channelCount: nodeData.channel_count,
     channels: nodeData.channels
@@ -59,7 +66,7 @@ app.get("/node/:pubkey", async (req, res, next) => {
   if (!req.params.pubkey) throw new Error("no pubkey");
   try {
     const info = await getNode({ lnd, public_key: req.params.pubkey });
-    res.json(pruneNodeData(info));
+    res.json(pruneNodeData(info, req.params.pubkey));
   } catch (e) {
     res.status(e[0]);
     res.end(e[1]);
