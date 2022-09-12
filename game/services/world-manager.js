@@ -1,65 +1,44 @@
 import me from "../lib/melon.js";
-import { loadPack } from "./resource-manager.js";
+import * as islandManager from "./island-manager.js";
+import { islandMaps } from "../resources.js";
+import * as levelManager from "./level-manager.js";
+import * as navGridService from "./navgrid.js";
+import AgentEntity from "../entities/Agent.js";
+import { GRID } from "../const/grid.js";
 
-async function loadWorldMetadata(baseURL) {
-  const metadata = await fetch(new URL("world.json", baseURL).toString()).then(
-    (res) => res.json()
-  );
+export async function loadIsland(id) {
+  const island = await islandManager.loadIsland(id);
 
-  if (!metadata.resources || !metadata.mainMap) {
-    throw new Error("failed to load world");
+  const map =
+    islandMaps[Math.floor(island.rng.getNumber(0) * islandMaps.length)];
+
+  await levelManager.loadLevel(map.name);
+
+  const size = navGridService.getGridSize();
+  let spawn = null;
+  while (!spawn) {
+    // TODO: use the islands rng for spawn point
+    const cell = new me.Vector2d(
+      Math.floor(Math.random() * size.x),
+      Math.floor(Math.random() * size.y)
+    );
+    const walls = navGridService.getCellWalls(cell);
+
+    if (walls === navGridService.WALLS.EMPTY) {
+      spawn = cell;
+    }
   }
 
-  const resources = metadata.resources.map((resource) => {
-    if (resource.src) {
-      return {
-        ...resource,
-        src: new URL(resource.src, baseURL).toString(),
-      };
-    }
-    return resource;
-  });
-
-  const dataUrls = [];
-  await Promise.all(
-    resources.map(async (resource) => {
-      if (resource.src && resource.type === "image") {
-        const blob = await fetch(resource.src).then((res) => res.blob());
-        const dataUrl = URL.createObjectURL(blob);
-        dataUrls.push(dataUrl);
-        resource.src = dataUrl;
-      }
-    })
+  console.log("spawning player at", spawn);
+  const player = new AgentEntity(spawn.x * GRID, spawn.y * GRID, {});
+  const playerLevel = me.game.world.children.find(
+    (obj) => obj.name === "player" && obj instanceof me.Container
   );
 
-  const unload = () => {
-    for (const dataUrl of dataUrls) {
-      URL.revokeObjectURL(dataUrl);
-    }
-  };
-
-  return {
-    ...metadata,
-    resources,
-    unload,
-  };
-}
-
-let loadedWorld = null;
-
-export function loadIpfsWorld(ipfsHash) {
-  return loadWorld(`https://ipfs.infura.io/ipfs/${ipfsHash}/`);
-}
-
-export async function loadWorld(url) {
-  me.state.change(me.state.LOADING);
-  const world = await loadWorldMetadata(url);
-
-  if (loadedWorld) {
-    loadedWorld.unload();
+  if (playerLevel) {
+    playerLevel.addChild(player);
+  } else {
+    console.error("Missing player level");
+    me.game.world.addChild(player);
   }
-  await loadPack(world.resources);
-  me.state.change(me.state.PLAY, world.mainMap);
 }
-
-window.loadWorld = loadWorld;

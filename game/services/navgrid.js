@@ -26,6 +26,9 @@ function createEmptyGrid(size) {
 }
 
 // grid methods
+export function getGridSize() {
+  return gridSize.clone();
+}
 export function setGridSize(v) {
   gridSize.copy(v);
   clearAll();

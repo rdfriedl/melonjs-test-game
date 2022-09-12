@@ -6,10 +6,9 @@ import TeleporterEntity from "./entities/teleporter.js";
 import TunnelEntity from "./entities/tunnel.js";
 import AgentEntity from "./entities/Agent.js";
 import SignEntity from "./entities/sign.js";
-import "./services/world-manager.js";
+import * as worldManager from "./services/world-manager.js";
 
 import "./debug.js";
-import { loadLevel } from "./services/level-manager.js";
 
 me.device.onReady(() => {
   // initialize the display canvas once the device/browser is ready
@@ -56,7 +55,10 @@ me.device.onReady(() => {
   me.loader.preload(globalResources, () => {
     loadPack(hubWorldResources).then(() => {
       me.state.change(me.state.PLAY);
-      loadLevel("islands/plains-1");
+
+      worldManager.loadIsland(
+        "03c9655f0ad13d692d7d919d3482959f8b783bdec423616efd8af7f81129787b4e"
+      );
     });
   });
 });

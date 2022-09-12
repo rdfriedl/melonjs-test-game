@@ -5,6 +5,35 @@ const GRAPH_URL = "http://localhost:5000";
 const islandCache = new Map();
 const tunnelCache = new Map();
 
+function getConnectedNodes(islandOrTunnel, levels = 2, nodes = new Set()) {
+  if (islandOrTunnel instanceof Island) {
+    for (const tunnel of islandOrTunnel.tunnels) {
+      if (tunnel && !nodes.has(tunnel)) {
+        nodes.add(tunnel);
+        if (levels > 0) getConnectedNodes(tunnel, levels - 1, nodes);
+      }
+    }
+  } else if (islandOrTunnel instanceof Tunnel) {
+    for (const island of islandOrTunnel.connections) {
+      if (island && !nodes.has(island)) {
+        nodes.add(island);
+        if (levels > 0) getConnectedNodes(island, levels - 1, nodes);
+      }
+    }
+  }
+  return nodes;
+}
+export function pruneCache(islandOrTunnel, levels = 2) {
+  const keep = getConnectedNodes(islandOrTunnel, levels);
+
+  Array.from(islandCache.values)
+    .filter((island) => !keep.includes(island))
+    .forEach((island) => islandCache.delete(island.id));
+  Array.from(tunnelCache.values)
+    .filter((tunnel) => !keep.includes(tunnel))
+    .forEach((tunnel) => tunnelCache.delete(tunnel.id));
+}
+
 export function getIsland(id) {
   return islandCache.get(id);
 }
@@ -12,11 +41,14 @@ export function getTunnel(id) {
   return tunnelCache.get(id);
 }
 
+export function createUrl(url) {
+  return new URL(url, GRAPH_URL).toString();
+}
 export async function loadTunnel(id) {
   if (tunnelCache.has(id)) return tunnelCache.get(id);
 
-  const channelData = await fetch(new URL(`/channel/${id}`, GRAPH_URL)).then(
-    (res) => res.json()
+  const channelData = await fetch(createUrl(`/channel/${id}`)).then((res) =>
+    res.json()
   );
 
   const tunnel = new Tunnel(channelData);
@@ -26,7 +58,7 @@ export async function loadTunnel(id) {
 export async function loadIsland(id) {
   if (islandCache.has(id)) return islandCache.get(id);
 
-  const nodeData = await fetch(new URL(`/node/${id}`, GRAPH_URL)).then((res) =>
+  const nodeData = await fetch(createUrl(`/node/${id}`)).then((res) =>
     res.json()
   );
 
