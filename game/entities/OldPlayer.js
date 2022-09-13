@@ -1,8 +1,6 @@
 import { SnappedVec2d } from "../helpers/snapped-vec-2d.js";
 import me from "../lib/melon.js";
 import { getCellInteraction } from "../services/interactions.js";
-// import { loadIpfsWorld } from "../services/world-manager.js";
-// import DoorEntity from "./door.js";
 
 const imageFrames = (x, y, w, count) =>
   new Array(count).fill(0).map((_, i) => y * w + x + i);
@@ -162,7 +160,6 @@ export default class OldPlayerEntity extends me.Sprite {
   //   // if (response.b.body.collisionType === me.collision.types.WORLD_SHAPE) {
   //   //     // makes the other object solid, by substracting the overlap vector to the current position
   //   //     this.pos.sub(response.overlapV);
-  //   //     console.log(response.overlapV);
   //   //     // not solid
   //   //     return false;
   //   // }

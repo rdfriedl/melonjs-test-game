@@ -6,7 +6,7 @@ import TeleporterEntity from "./entities/teleporter.js";
 import TunnelEntity from "./entities/tunnel.js";
 import AgentEntity from "./entities/Agent.js";
 import SignEntity from "./entities/sign.js";
-import * as worldManager from "./services/world-manager.js";
+import * as levelManager from "./services/level-manager.js";
 
 import "./debug.js";
 
@@ -56,7 +56,7 @@ me.device.onReady(() => {
     loadPack(hubWorldResources).then(() => {
       me.state.change(me.state.PLAY);
 
-      worldManager.loadIsland(
+      levelManager.loadIsland(
         "03c9655f0ad13d692d7d919d3482959f8b783bdec423616efd8af7f81129787b4e"
       );
     });

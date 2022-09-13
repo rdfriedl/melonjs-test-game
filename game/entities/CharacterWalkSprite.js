@@ -1,9 +1,5 @@
 import { GRID } from "../const/grid.js";
-import { SnappedVec2d } from "../helpers/snapped-vec-2d.js";
 import me from "../lib/melon.js";
-import { getCellInteraction } from "../services/interactions.js";
-// import { loadIpfsWorld } from "../services/world-manager.js";
-// import DoorEntity from "./door.js";
 
 const imageFrames = (x, y, w, count) =>
   new Array(count).fill(0).map((_, i) => y * w + x + i);

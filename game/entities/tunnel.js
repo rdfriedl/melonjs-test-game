@@ -6,6 +6,7 @@ import {
   INTERACTION_SIDE,
   setCellInteraction,
 } from "../services/interactions.js";
+import { getDoorTunnelId, tmpSkipTunnel } from "../services/level-manager.js";
 import { addCellWall, WALLS } from "../services/navgrid.js";
 
 export default class TunnelEntity extends me.Sprite {
@@ -17,12 +18,16 @@ export default class TunnelEntity extends me.Sprite {
       height: GRID * 2,
     });
 
+    this.doorId = settings.id;
     this.cell = new me.Vector2d().copy(this.pos).div(GRID).floorSelf();
 
     setCellInteraction(
       this.cell.clone().add(DIRECTION.DOWN),
       INTERACTION_SIDE.STAND,
-      () => console.info("tunnel")
+      () => {
+        const tunnelId = getDoorTunnelId(this.doorId);
+        tmpSkipTunnel(tunnelId);
+      }
     );
     addCellWall(
       this.cell.clone().add(DIRECTION.DOWN),

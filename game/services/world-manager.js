@@ -1,44 +1,117 @@
-import me from "../lib/melon.js";
-import * as islandManager from "./island-manager.js";
-import { islandMaps } from "../resources.js";
-import * as levelManager from "./level-manager.js";
-import * as navGridService from "./navgrid.js";
-import AgentEntity from "../entities/Agent.js";
-import { GRID } from "../const/grid.js";
+const GRAPH_URL = "http://localhost:5000";
 
+const islandCache = new Map();
+const tunnelCache = new Map();
+
+function getConnectedNodes(islandOrTunnel, levels = 2, nodes = new Set()) {
+  if (islandOrTunnel instanceof Island) {
+    for (const tunnel of islandOrTunnel.tunnels) {
+      if (tunnel && !nodes.has(tunnel)) {
+        nodes.add(tunnel);
+        if (levels > 0) getConnectedNodes(tunnel, levels - 1, nodes);
+      }
+    }
+  } else if (islandOrTunnel instanceof Tunnel) {
+    for (const island of islandOrTunnel.connections) {
+      if (island && !nodes.has(island)) {
+        nodes.add(island);
+        if (levels > 0) getConnectedNodes(island, levels - 1, nodes);
+      }
+    }
+  }
+  return nodes;
+}
+export function pruneCache(islandOrTunnel, levels = 2) {
+  const keep = getConnectedNodes(islandOrTunnel, levels);
+
+  Array.from(islandCache.values)
+    .filter((island) => !keep.includes(island))
+    .forEach((island) => islandCache.delete(island.id));
+  Array.from(tunnelCache.values)
+    .filter((tunnel) => !keep.includes(tunnel))
+    .forEach((tunnel) => tunnelCache.delete(tunnel.id));
+}
+
+export function getIsland(id) {
+  return islandCache.get(id);
+}
+export function getTunnel(id) {
+  return tunnelCache.get(id);
+}
+
+export function createUrl(url) {
+  return new URL(url, GRAPH_URL).toString();
+}
+export async function loadTunnel(id) {
+  if (tunnelCache.has(id)) return tunnelCache.get(id);
+
+  const channelData = await fetch(createUrl(`/channel/${id}`)).then((res) =>
+    res.json()
+  );
+
+  const tunnel = new Tunnel(channelData);
+  tunnelCache.set(id, tunnel);
+  return tunnel;
+}
 export async function loadIsland(id) {
-  const island = await islandManager.loadIsland(id);
+  if (islandCache.has(id)) return islandCache.get(id);
 
-  const map =
-    islandMaps[Math.floor(island.rng.getNumber(0) * islandMaps.length)];
+  const nodeData = await fetch(createUrl(`/node/${id}`)).then((res) =>
+    res.json()
+  );
 
-  await levelManager.loadLevel(map.name);
+  const island = new Island(nodeData);
+  islandCache.set(id, island);
+  return island;
+}
 
-  const size = navGridService.getGridSize();
-  let spawn = null;
-  while (!spawn) {
-    // TODO: use the islands rng for spawn point
-    const cell = new me.Vector2d(
-      Math.floor(Math.random() * size.x),
-      Math.floor(Math.random() * size.y)
-    );
-    const walls = navGridService.getCellWalls(cell);
+export class Island {
+  constructor(nodeData) {
+    this.id = nodeData.pubKey;
+    this.name = nodeData.alias;
 
-    if (walls === navGridService.WALLS.EMPTY) {
-      spawn = cell;
+    this.tunnelIds = nodeData.channels.map((channel) => channel.id);
+
+    for (const channelData of nodeData.channels) {
+      if (!tunnelCache.has(channelData.id)) {
+        const tunnel = new Tunnel(channelData);
+        tunnelCache.set(channelData.id, tunnel);
+      }
     }
   }
 
-  console.log("spawning player at", spawn);
-  const player = new AgentEntity(spawn.x * GRID, spawn.y * GRID, {});
-  const playerLevel = me.game.world.children.find(
-    (obj) => obj.name === "player" && obj instanceof me.Container
-  );
+  get tunnels() {
+    return this.tunnelIds.map((id) => getTunnel(id));
+  }
 
-  if (playerLevel) {
-    playerLevel.addChild(player);
-  } else {
-    console.error("Missing player level");
-    me.game.world.addChild(player);
+  get loaded() {
+    return !this.tunnelIds.some((id) => !getTunnel(id));
+  }
+
+  async loadConnections() {
+    for (const id of this.tunnelIds) {
+      await loadTunnel(id);
+    }
+  }
+}
+
+export class Tunnel {
+  constructor(channelData) {
+    this.id = channelData.id;
+    this.islandIds = channelData.nodes;
+  }
+
+  get connections() {
+    return this.islandIds.map((id) => getIsland(id));
+  }
+
+  get loaded() {
+    return !this.islandIds.some((id) => !getIsland(id));
+  }
+
+  async loadConnections() {
+    for (const id of this.islandIds) {
+      await loadIsland(id);
+    }
   }
 }
