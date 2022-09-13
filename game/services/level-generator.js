@@ -16,7 +16,7 @@ function islandMapGetTunnelDoors(mapName) {
   const tmx = me.loader.getTMX(mapName);
 
   return tmx.layers
-    .filter((layer) => layer.type === "objectgroup")
+    .filter((layer) => layer.type === "objectgroup" && layer.objects)
     .map((layer) => layer.objects)
     .reduce((a, b) => a.concat(b), [])
     .filter((object) => object.name === "tunnel");

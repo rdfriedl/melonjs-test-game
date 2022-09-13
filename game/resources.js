@@ -60,11 +60,16 @@ export const hubWorldResources = [
   ...tileset("tilesets/ForgottenPlains/ForgottenPlainsProps"),
 ];
 
-export const islandMaps = [islandMap("plains-1"), islandMap("small")];
+export const islandMaps = [
+  islandMap("plains-1"),
+  islandMap("small"),
+  islandMap("small-2"),
+];
 export const dungeonMaps = [
   dungeonMap("bottom-right-1"),
   dungeonMap("bottom-top-1"),
   dungeonMap("left-right-1"),
+  dungeonMap("left-right-2"),
   dungeonMap("left-up-right-1"),
 ];
 export const maps = [...islandMaps, ...dungeonMaps];

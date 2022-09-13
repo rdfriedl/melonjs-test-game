@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.9" tiledversion="1.9.0" orientation="orthogonal" renderorder="right-down" width="32" height="24" tilewidth="8" tileheight="8" infinite="0" nextlayerid="12" nextobjectid="3">
+ <tileset firstgid="1" source="../../tilesets/Dungeon/DungeonProps.tsx"/>
+ <tileset firstgid="494" source="../../tilesets/Dungeon/DungeonFloorTiles.tsx"/>
+ <tileset firstgid="508" source="../../tilesets/Dungeon/DungeonWallTiles.tsx"/>
+ <tileset firstgid="606" source="../../tilesets/Dungeon/DungeonCliffTiles.tsx"/>
+ <tileset firstgid="608" source="../../tilesets/Walls.tsx"/>
+ <tileset firstgid="864" source="../../tilesets/Dungeon/DungeonWallTilesetShadows.tsx"/>
+ <layer id="2" name="ground" width="32" height="24">
+  <data encoding="base64" compression="zlib">
+   eJztVLsOhDAMAz70+P8FcarKwIQYKrVRHk4Iw0lnyQNVqOPG7TT9kYVtHvn0f+9erbYGe9D0Ud7aB1An6VemdiffX2c/Hn2Uhez9WUZG/Ue5LiNR/YyZc36e6NN5Z/AE9KWsZJDu3YBovnEeWZQyb92FE6yzvPeZr8K6Ng/PnblZhDnSLKF3oYf0hnAZKYZO7Yjqc2/IrvQgnYknNxr6+gPwovVJz7Z5RPWj5HJm6TZIXiLvVAQZ/n9Zn2ZG4xv6NDMarf4kXP3GxWE=
+  </data>
+ </layer>
+ <layer id="4" name="walls" width="32" height="24">
+  <data encoding="base64" compression="zlib">
+   eJzlVlEKgzAMFdExUH90P7oDjP04L6AHGP4M73+XVUjgLWu7NjI2tkAIrTavSfrSJsnvSJYmSQO6S+PX5xYN9VOY/zrQKhJ/XV8aHcmy1hTPVexrT5bjPQi8OjKewjHfmvnJ6E3sryLL8R7T53UYB66LwfflSyPfhI/1a6g+J/p+hhrnlvqG4mcWnyxYv47q0xu9GB2gxqWlvqH4hcVnqPgwQvElXgz+yqGZuCd5o8WXvHT5X2Xl3ULck360+JKXLv+v/GjxXcJ9Dvs3jrXnPxS/BR5MlA8ca8+/xMd7Zsu+OV8zWeQ4z/E9IfPItd+Cz/layPb0/wBz3O85j6Mlj1r8UNH6+Xd8yUef+t5IWny8l6b0cSy/SS7we8nWN94hkgsd9dSY8/4JuQO7XBf+
+  </data>
+ </layer>
+ <objectgroup id="11" name="connections">
+  <object id="1" name="right" x="248" y="96" width="8" height="16"/>
+  <object id="2" name="left" x="0" y="72" width="8" height="16"/>
+ </objectgroup>
+ <objectgroup id="10" name="player"/>
+ <layer id="9" name="walls_above" width="32" height="24">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUDDagwTQ0zBwFo2AUDB4wmsdHwSgYBcQCAHBfAH8=
+  </data>
+ </layer>
+ <layer id="8" name="nav" width="32" height="24" opacity="0.2" tintcolor="#ff0004">
+  <data encoding="base64" compression="zlib">
+   eJztlEEOwCAIBI0/9v+XXr1UZtdYYgPJnoQdQOPorY3SbzTHbr3jc4L/Fmo+6cvlKz50D2S/hB95ZvKjWOXQ+1q9S1JL5nf50T6y+YoPPaO9qP/LLXyXR3p3ZrqVT6P43yibX9L1AEUz5gE=
+  </data>
+ </layer>
+</map>
