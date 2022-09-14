@@ -5,7 +5,7 @@ import {
   setCellInteraction,
   INTERACTION_SIDE,
 } from "../services/interactions.js";
-import { loadLevel } from "../services/level-manager.js";
+import { loadMap } from "../services/level-manager.js";
 
 export default class TeleporterEntity extends me.Sprite {
   constructor(x, y, settings) {
@@ -16,7 +16,7 @@ export default class TeleporterEntity extends me.Sprite {
 
     this.cell = new me.Vector2d(x + GRID, y + GRID).div(GRID).floor();
     setCellInteraction(this.cell, INTERACTION_SIDE.UNDER, () => {
-      loadLevel("islands/small");
+      loadMap("islands/small");
     });
   }
 

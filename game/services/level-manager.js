@@ -6,9 +6,9 @@ import { updateNavGrid } from "./pathfinder.js";
 import * as worldManager from "./world-manager.js";
 import * as navGridService from "./navgrid.js";
 import AgentEntity from "../entities/Agent.js";
-import { generateIsland } from "./level-generator.js";
+import { generateWorld } from "./world-generator.js";
 
-export async function loadLevel(name) {
+export async function loadMap(name) {
   if (!name) throw new Error("no level name");
 
   return new Promise((res) => {
@@ -51,31 +51,33 @@ export async function loadLevel(name) {
 }
 
 let loaded = null;
+let loadedIsland = 0;
 
 export function getDoorTunnelId(doorId) {
-  if (loaded instanceof worldManager.Island) {
-    const generated = generateIsland(loaded);
+  if (loaded instanceof worldManager.World) {
+    const generated = generateWorld(loaded);
+    const island = generated.islands[loadedIsland];
 
-    return generated.connections.find((conn) => conn.doorId === String(doorId))
-      ?.tunnelId;
+    return island.doors.find((door) => door.id === String(doorId))?.tunnelId;
   }
 }
 
 export function tmpSkipTunnel(tunnelId) {
   const tunnel = worldManager.getTunnel(tunnelId);
-  const otherIslandId = tunnel.islandIds.find((id) => id !== loaded.id);
+  const otherIslandId = tunnel.worldIds.find((id) => id !== loaded.id);
   if (otherIslandId) {
-    return loadIsland(otherIslandId);
+    return loadWorld(otherIslandId);
   }
 }
 
-export async function loadIsland(id) {
-  const island = await worldManager.loadIsland(id);
-  loaded = island;
+export async function loadWorld(id) {
+  const world = await worldManager.loadWorld(id);
+  loaded = world;
 
-  const generated = generateIsland(island);
-  console.info("Loading island", id, generated);
-  await loadLevel(generated.map);
+  const generated = generateWorld(world);
+  console.info("Loading world", id, generated);
+  loadedIsland = 0;
+  await loadMap(generated.islands[loadedIsland].map);
 
   const size = navGridService.getGridSize();
   let spawn = null;
@@ -106,5 +108,5 @@ export async function loadIsland(id) {
   }
 
   // only keep things that are connected to this island
-  worldManager.pruneCache(island);
+  worldManager.pruneCache(world);
 }

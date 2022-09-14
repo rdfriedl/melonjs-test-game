@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.0" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="8" tileheight="8" infinite="0" nextlayerid="16" nextobjectid="24">
+<map version="1.9" tiledversion="1.9.0" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="8" tileheight="8" infinite="0" nextlayerid="16" nextobjectid="25">
  <tileset firstgid="1" source="../../tilesets/ShipsAndDocks/ShipsAndDocks_Props.tsx"/>
  <tileset firstgid="793" source="../../tilesets/ShipsAndDocks/ShipsAndDocks_Docks.tsx"/>
  <tileset firstgid="2158" source="../../tilesets/Walls.tsx"/>
@@ -40,7 +40,7 @@
    eJzt11EKgzAMAND86hXc7rK7T++ln2Oj0jGmtXkP+qNQjGlIGgEAAADHmMaI27bu49lfAsA3nkPEvK1l+HxXel7Scy/Y+0/04zXP2XPea+xyzJ5fz8SV+uB7nFlqIUuc1GmhZv/Zi0p7qwMyyj73PS4wm0BrWpgTAACok/3OBzXccQAAoD0rzN8nBg==
   </data>
  </layer>
- <objectgroup id="14" name="connections">
+ <objectgroup id="14" name="player">
   <object id="4" name="tunnel" x="136" y="352" width="8" height="16"/>
   <object id="19" name="tunnel" x="200" y="304" width="8" height="16"/>
   <object id="15" name="tunnel" x="112" y="352" width="8" height="16"/>
@@ -48,13 +48,7 @@
   <object id="6" name="tunnel" x="392" y="184" width="8" height="16"/>
   <object id="7" name="tunnel" x="200" y="120" width="8" height="16"/>
   <object id="16" name="tunnel" x="176" y="120" width="8" height="16"/>
- </objectgroup>
- <objectgroup id="13" name="player">
-  <object id="21" name="sign" x="216" y="328" width="8" height="8">
-   <properties>
-    <property name="message" value="hello world"/>
-   </properties>
-  </object>
+  <object id="24" name="tunnel" x="184" y="336" width="8" height="16"/>
  </objectgroup>
  <layer id="9" name="props_above" width="64" height="64">
   <data encoding="base64" compression="zlib">

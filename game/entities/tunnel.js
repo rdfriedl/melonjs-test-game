@@ -20,24 +20,26 @@ export default class TunnelEntity extends me.Sprite {
 
     this.doorId = settings.id;
     this.cell = new me.Vector2d().copy(this.pos).div(GRID).floorSelf();
+    this.tunnelId = getDoorTunnelId(this.doorId);
 
-    setCellInteraction(
-      this.cell.clone().add(DIRECTION.DOWN),
-      INTERACTION_SIDE.STAND,
-      () => {
-        const tunnelId = getDoorTunnelId(this.doorId);
-        tmpSkipTunnel(tunnelId);
-      }
-    );
-    addCellWall(
-      this.cell.clone().add(DIRECTION.DOWN),
-      NAV_LAYERS.TUNNELS,
-      WALLS.BOTTOM | WALLS.NEGATIVE
-    );
-    addCellWall(
-      this.cell.clone().add(DIRECTION.DOWN).add(DIRECTION.DOWN),
-      NAV_LAYERS.TUNNELS,
-      WALLS.TOP | WALLS.NEGATIVE
-    );
+    if (this.tunnelId) {
+      setCellInteraction(
+        this.cell.clone().add(DIRECTION.DOWN),
+        INTERACTION_SIDE.STAND,
+        () => tmpSkipTunnel(this.tunnelId)
+      );
+      addCellWall(
+        this.cell.clone().add(DIRECTION.DOWN),
+        NAV_LAYERS.TUNNELS,
+        WALLS.BOTTOM | WALLS.NEGATIVE
+      );
+      addCellWall(
+        this.cell.clone().add(DIRECTION.DOWN).add(DIRECTION.DOWN),
+        NAV_LAYERS.TUNNELS,
+        WALLS.TOP | WALLS.NEGATIVE
+      );
+    } else {
+      this.isRenderable = false;
+    }
   }
 }

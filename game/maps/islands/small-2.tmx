@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.0" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="8" tileheight="8" infinite="0" nextlayerid="21" nextobjectid="6">
+<map version="1.9" tiledversion="1.9.0" orientation="orthogonal" renderorder="right-down" width="64" height="64" tilewidth="8" tileheight="8" infinite="0" nextlayerid="25" nextobjectid="10">
  <tileset firstgid="1" source="../../tilesets/ForgottenPlains/ForgottenPlainsProps.tsx"/>
  <tileset firstgid="221" source="../../tilesets/ForgottenPlains/ForgottenPlainsTiles.tsx"/>
  <tileset firstgid="1808" source="../../tilesets/Walls.tsx"/>
@@ -24,12 +24,11 @@
    eJzt1LFtAkEUBNC9O3cAyHYxiDYggFpICGwLKAZoAwJcECMhAlKEboN7T5p8ZqW/pQAAAADA+/w0pfwmf8mhq92mf+fsviTH7p6hGbWljJNJMv2o3aZ/8+xeJOsBbn/VKXeyzc3skn1Tu03/Hn/FNdv/B7h/llv5zM18Jd9t7TZ1bPIGy2xfDXQ/AAAAAAAAAAAAz24e5A52
   </data>
  </layer>
- <objectgroup id="10" name="player"/>
- <objectgroup id="20" name="connections">
-  <object id="1" name="tunnel" x="272" y="184" width="8" height="16"/>
-  <object id="3" name="tunnel" x="296" y="240" width="8" height="16"/>
-  <object id="4" name="tunnel" x="248" y="168" width="8" height="16"/>
- </objectgroup>
+ <layer id="22" name="props" width="64" height="64">
+  <data encoding="base64" compression="zlib">
+   eJzt18ENAiEQBVC604uWpsaG3BI0utYjZ8PFFXYC+14yIeFA/mEgTEoAAAAA8L9drn10CICGHoW9++op+nONDsBiU3SAYO/G5/dyN27p91445DrWjxJiTu17YRSvtKxfRlLql1Ouc67L+nFCPb9W2Cp3gC0rzdAjm6IDBCv9mXv7G9aeY8wSQO96e8dr844DAAAA0T7KoRoq
+  </data>
+ </layer>
  <layer id="18" name="dock_stone" width="64" height="64">
   <data encoding="base64" compression="zlib">
    eJztz7cNAkEUBuEXH83gmgBCXBNAiOsEJ0EfIBCmFEwZTAAhl6GTVvNJI+3L9o+QJEmSJEnSL+UsokLVnGpUz4r+6X+02dWhbk496ie6f8yuCU1zmtHc/UlasGtJK9rS7vNulCKa1KI19ybR/Xt2HehMF7rSjQbsHtKIjtynRPd/3dn3oCe9Et8qSZIkSZIkSZIkSZIkSZKK9wZc0SOI
@@ -42,17 +41,28 @@
  </layer>
  <layer id="14" name="trees" width="64" height="64">
   <data encoding="base64" compression="zlib">
-   eJzt1MERgDAIBMBUqVapligF+PFhQNmduf/BJIwBAAAAAPC+PXJEzuwiQHnuBXxHx//6dOaOOwK4s0TWyJZdhHQV3sLMDhXmnaHLnAB/5Y4DAAAAQC0XeRIQYA==
+   eJzt1jEOgDAIAEBfqb5SfaKMalwcbFHuEnagLXQYAAAAAADet0SsEVvvRID0zAv4jorv9WnNFXsEcGeMmCLm3onQXYa70HI/Z6i3hSp1/s313PxdqcTcOtMPKrL3ODIHAQAAyGYHUl8YkQ==
   </data>
  </layer>
+ <objectgroup id="10" name="player">
+  <object id="6" name="tunnel" x="272" y="184" width="8" height="16"/>
+  <object id="7" name="tunnel" x="296" y="240" width="8" height="16"/>
+  <object id="8" name="tunnel" x="248" y="168" width="8" height="16"/>
+  <object id="9" name="tel" x="168" y="192" width="24" height="24"/>
+ </objectgroup>
  <layer id="15" name="trees_above" width="64" height="64">
   <data encoding="base64" compression="zlib">
-   eJzt1cENwjAQRNEtAigCKMJQD1AEpAigWuaWKFKkcHBm4/wnzdljy15HAAAAAAAAYCk35a483EVMnspL6dxFTN7KR/m6i2AVmBfMC+bFemzxvQ73POe9tnZGwz3Pea+tzbR/ZxQzDejtlL1ycBcxOSon5ewuYlKUi3KNHHdhyQ7jtTLchRodps50vFaJ/i641OgwdaY11sqoxDb2CbQsw//slOF/dirBHAcAAAAAAACQxw/ePSAa
+   eJzt2N0NwjAMRlEPAQwBDGGYBxgCGAKYFr+1tRRoQa3zc4/0vcdNYkcVAQAAAAAAwFJOlrPlEr2QIFfLzXKPXkiQh+VpeUUvBEWgX9Av6BflaPG+9msec19r+0b9msfc19p62tQeRU8DOivL2rKJXkiQrWVn2UcvJIhaDpaj5HEWlpzPvt4czsIc8zm1r75ele4sRJljPqf2VSW+3k/8vv16N1TyrjPF71ttb9dvVIb71trbNYd5FMmf/9a+h8rw/OcwnyOplNnH/1XbP5upWpt7np97rfVBjz7YZh8EAAAAACBXb3ovMPE=
   </data>
  </layer>
- <layer id="9" name="nav" width="64" height="64" opacity="0.37" tintcolor="#ff0004">
+ <layer id="24" name="props_above" width="64" height="64">
   <data encoding="base64" compression="zlib">
-   eJztlkESgyAMRd2xrZ6gcoLqCeoN2vtfpjjVaSaDYqgYhZ+Zt6hazAsBbE1VtQAAAAD4i5ujnmhOkM/R3B1z2BPkA3/4wx/+8Ic//NPzcAyOp6Mn18do2W8a2nnHQr/3Zt6Ol/l9A9KeoOH7L0fbL8SSG10D/JluqtuW0PZL4S8Na85bi3G9j/M5mO+a7xi90L/2PGvJNW3ftT5Y2u+5P7+/df7XxtCC7nFjnkv74Vr+W6KZ+mkpNGswr/GYtS7tBclYR7FnztL68f3iav48d5+/Fb7rin0Q8peMoc2e/tIxtd1D+frO95C/JLS9ff5b9ijqT5+/4tz7apCil87un6KOufvHhnbe8E/nvnZm5OJf4rzHBD8br0qMby5zz/P3eYZqpe2Quick90qgVO/S3QEAAKQht2/LvfxLqQP84Q//Mt3hD3/4wx/+8Ic//OFfnv8HuugphQ==
+   eJzt17ENwCAUQ0EasgQsQZpk/8n4K0SKZIo76fVu3RoAAADwl15d6RFBo5rpEUGrutMjAACIe6o3PQIAAOADPwYAAAAAAM6xAbF4AYQ=
+  </data>
+ </layer>
+ <layer id="9" name="nav" width="64" height="64" opacity="0.17" tintcolor="#ff0004">
+  <data encoding="base64" compression="zlib">
+   eJztl1EOgjAMhn3bq3AC2AmEE8gN9P6XcYsjNs0GbDDL2N/kSwzo7Ld2FXt1u/UAAAAA2E3jkM5Dijmk85CgI/76BPnA//+g/+utf+3+vUL/11z/h2EyPA0juc77gYd03qnc1e95b+ZteLnXLesJGr7PcqT91gi50TPQER8bg9u3LSHtd5T/ntDqvHthz7ut56S+Z35gjJH+jee9mlyT9l3qg9C85/78/tb6L60hBZ1xNs/QPFzKf0u0rp9CIbkHeyLnWiX6x85KPi9K8+e5+/x15HeV2Adr/jFrSHOkf+ya0u5r+fLzSp8LQ/4xIe3t898yo6g/fX+JtfftQY5eOrt/jn28un9qSOcN/3zuvv+EV/Ovse4pwX8bSyXF9yq15/n7PNf2Stohd0/E3KuBWr1rdwcAAAAAAAAAAAAAAACQxgdoRDtd
   </data>
  </layer>
 </map>

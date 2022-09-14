@@ -1,39 +1,39 @@
 const GRAPH_URL = "http://localhost:5000";
 
-const islandCache = new Map();
+const worldCache = new Map();
 const tunnelCache = new Map();
 
-function getConnectedNodes(islandOrTunnel, levels = 2, nodes = new Set()) {
-  if (islandOrTunnel instanceof Island) {
-    for (const tunnel of islandOrTunnel.tunnels) {
+function getConnectedNodes(worldOrTunnel, levels = 2, nodes = new Set()) {
+  if (worldOrTunnel instanceof World) {
+    for (const tunnel of worldOrTunnel.tunnels) {
       if (tunnel && !nodes.has(tunnel)) {
         nodes.add(tunnel);
         if (levels > 0) getConnectedNodes(tunnel, levels - 1, nodes);
       }
     }
-  } else if (islandOrTunnel instanceof Tunnel) {
-    for (const island of islandOrTunnel.connections) {
-      if (island && !nodes.has(island)) {
-        nodes.add(island);
-        if (levels > 0) getConnectedNodes(island, levels - 1, nodes);
+  } else if (worldOrTunnel instanceof Tunnel) {
+    for (const world of worldOrTunnel.connections) {
+      if (world && !nodes.has(world)) {
+        nodes.add(world);
+        if (levels > 0) getConnectedNodes(world, levels - 1, nodes);
       }
     }
   }
   return nodes;
 }
-export function pruneCache(islandOrTunnel, levels = 2) {
-  const keep = getConnectedNodes(islandOrTunnel, levels);
+export function pruneCache(worldOrTunnel, levels = 2) {
+  const keep = getConnectedNodes(worldOrTunnel, levels);
 
-  Array.from(islandCache.values)
-    .filter((island) => !keep.includes(island))
-    .forEach((island) => islandCache.delete(island.id));
+  Array.from(worldCache.values)
+    .filter((world) => !keep.includes(world))
+    .forEach((world) => worldCache.delete(world.id));
   Array.from(tunnelCache.values)
-    .filter((tunnel) => !keep.includes(tunnel))
-    .forEach((tunnel) => tunnelCache.delete(tunnel.id));
+    .filter((world) => !keep.includes(world))
+    .forEach((world) => tunnelCache.delete(world.id));
 }
 
-export function getIsland(id) {
-  return islandCache.get(id);
+export function getWorld(id) {
+  return worldCache.get(id);
 }
 export function getTunnel(id) {
   return tunnelCache.get(id);
@@ -53,19 +53,19 @@ export async function loadTunnel(id) {
   tunnelCache.set(id, tunnel);
   return tunnel;
 }
-export async function loadIsland(id) {
-  if (islandCache.has(id)) return islandCache.get(id);
+export async function loadWorld(id) {
+  if (worldCache.has(id)) return worldCache.get(id);
 
   const nodeData = await fetch(createUrl(`/node/${id}`)).then((res) =>
     res.json()
   );
 
-  const island = new Island(nodeData);
-  islandCache.set(id, island);
-  return island;
+  const world = new World(nodeData);
+  worldCache.set(id, world);
+  return world;
 }
 
-export class Island {
+export class World {
   constructor(nodeData) {
     this.id = nodeData.pubKey;
     this.name = nodeData.alias;
@@ -98,20 +98,20 @@ export class Island {
 export class Tunnel {
   constructor(channelData) {
     this.id = channelData.id;
-    this.islandIds = channelData.nodes;
+    this.worldIds = channelData.nodes;
   }
 
   get connections() {
-    return this.islandIds.map((id) => getIsland(id));
+    return this.worldIds.map((id) => getWorld(id));
   }
 
   get loaded() {
-    return !this.islandIds.some((id) => !getIsland(id));
+    return !this.worldIds.some((id) => !getWorld(id));
   }
 
   async loadConnections() {
-    for (const id of this.islandIds) {
-      await loadIsland(id);
+    for (const id of this.worldIds) {
+      await loadWorld(id);
     }
   }
 }
